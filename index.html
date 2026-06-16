@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מדריך פשוט להפעלת צינתוק דרך API</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fb;
+      --surface: #ffffff;
+      --surface-2: #eef3f7;
+      --text: #16202a;
+      --muted: #5a6875;
+      --line: #d8e0e8;
+      --accent: #087f8c;
+      --accent-2: #7a5c00;
+      --danger: #9f2f2f;
+      --code-bg: #10212b;
+      --code-text: #edf7fb;
+      --shadow: 0 14px 34px rgba(18, 32, 43, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, "Noto Sans Hebrew", "Segoe UI", sans-serif;
+      line-height: 1.75;
+    }
+
+    header {
+      background: #12313b;
+      color: #fff;
+      padding: 42px 20px 34px;
+    }
+
+    .wrap {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #b7dce2;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 780px;
+      margin: 18px 0 0;
+      color: #d8edf1;
+      font-size: 19px;
+    }
+
+    main {
+      padding: 30px 0 50px;
+    }
+
+    section {
+      margin: 22px 0;
+      padding: 26px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 26px;
+      line-height: 1.3;
+    }
+
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 20px;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 0;
+      padding-inline-start: 24px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    code {
+      direction: ltr;
+      unicode-bidi: embed;
+      background: #e8eef3;
+      color: #10212b;
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95em;
+    }
+
+    header code {
+      background: #e6fbff;
+      color: #06343d;
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      font-weight: 800;
+    }
+
+    pre {
+      direction: ltr;
+      text-align: left;
+      overflow-x: auto;
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0 18px;
+      line-height: 1.55;
+      border: 1px solid #1c3f4e;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 4px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-2);
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .box {
+      background: #f9fbfc;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .box h3 {
+      margin-top: 0;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #dff2f4;
+      color: #075f68;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .note {
+      border-inline-start: 5px solid var(--accent);
+      background: #eef8fa;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+
+    .warn {
+      border-inline-start-color: var(--accent-2);
+      background: #fff8e6;
+    }
+
+    .danger {
+      border-inline-start-color: var(--danger);
+      background: #fff1f1;
+    }
+
+    .steps {
+      counter-reset: step;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      align-items: start;
+      margin: 14px 0;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        padding-top: 30px;
+      }
+
+      section {
+        padding: 20px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="eyebrow">API של ימות המשיח</p>
+      <h1>הפעלת צינתוק בצורה פשוטה וברורה</h1>
+      <p class="lead">
+        מדריך מעשי לפיצ'ר <code>RunTzintuk</code>: מה מגדירים במערכת הטלפונית,
+        מה מגדירים בשרת, ואיך נראית קריאת API בפועל.
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>מה הפיצ'ר הזה עושה?</h2>
+      <p>
+        הפקודה <code>RunTzintuk</code> מפעילה צינתוק למספר טלפון אחד, לכמה מספרים,
+        לרשימת תפוצה, או לרשימת צינתוקים חינמיים.
+      </p>
+      <p>
+        צינתוק הוא שיחה קצרה שיוצאת למנוי ומתנתקת אחרי מספר שניות. אפשר להשתמש בזה
+        להתראות, אישורי פעולה, תזכורות, או אימות מספר טלפון.
+      </p>
+      <div class="note">
+        <strong>השורה החשובה:</strong>
+        את הצינתוק לא "מגדירים בשלוחה" כמו תפריט רגיל. מפעילים אותו על ידי קריאת API
+        לשרת של ימות המשיח.
+      </div>
+    </section>
+
+    <section>
+      <h2>איפה מגדירים את זה?</h2>
+      <div class="grid">
+        <div class="box">
+          <span class="tag">במערכת הטלפונית / ניהול ימות</span>
+          <h3>מה נמצא בצד של ימות?</h3>
+          <ul>
+            <li>הטוקן או פרטי ההתחברות שמאפשרים גישה ל-API.</li>
+            <li>המספר הראשי של המערכת והמספרים המשניים.</li>
+            <li>רשימת צינתוקים חינמיים, אם רוצים לשלוח עם <code>tzl:LIST</code>.</li>
+            <li>רשימת תפוצה, אם רוצים לשלוח עם <code>tpl:LIST</code>.</li>
+            <li>זיהוי יוצא מאושר, אם לא משתמשים בברירת המחדל.</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <span class="tag">בשרת / באתר / בקוד שלך</span>
+          <h3>מה נמצא בצד שלך?</h3>
+          <ul>
+            <li>הקוד ששולח בקשת HTTP אל <code>RunTzintuk</code>.</li>
+            <li>המספרים או מספר הרשימה שאליהם רוצים לשלוח.</li>
+            <li>בחירת זמן הצינתוק, אם רוצים לשנות מברירת המחדל.</li>
+            <li>שמירת הטוקן בצורה מאובטחת, למשל בקובץ הגדרות או משתנה סביבה.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note warn">
+        <strong>לא מומלץ לשים טוקן בתוך דף HTML פתוח ללקוח.</strong>
+        אם מדובר באתר, הקריאה צריכה להישלח מהשרת שלך ולא ישירות מהדפדפן של המשתמש,
+        כדי שהטוקן לא יהיה חשוף.
+      </div>
+    </section>
+
+    <section>
+      <h2>המיקום המדויק של ההגדרות</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>מה רוצים לעשות?</th>
+            <th>איפה מגדירים?</th>
+            <th>מה שמים בקריאת ה-API?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>לשלוח צינתוק למספרים רגילים</td>
+            <td>בשרת שלך בלבד. אין צורך להגדיר רשימה במערכת.</td>
+            <td><code>phones=0500000000:0520000000</code></td>
+          </tr>
+          <tr>
+            <td>לשלוח לרשימת תפוצה קיימת</td>
+            <td>את רשימת התפוצה יוצרים ומנהלים במערכת ימות.</td>
+            <td><code>phones=tpl:123</code></td>
+          </tr>
+          <tr>
+            <td>לשלוח לרשימת צינתוקים חינמיים</td>
+            <td>את רשימת הצינתוקים החינמיים יוצרים ומנהלים במערכת ימות.</td>
+            <td><code>phones=tzl:100</code></td>
+          </tr>
+          <tr>
+            <td>לשלוח לכמה רשימות צינתוקים חינמיים</td>
+            <td>כל הרשימות צריכות להיות קיימות במערכת ימות.</td>
+            <td><code>phones=tzl:100,200,300</code></td>
+          </tr>
+          <tr>
+            <td>להשתמש בזיהוי יוצא מיוחד</td>
+            <td>הזיהוי צריך להיות מאושר או קיים במערכת ימות.</td>
+            <td><code>callerId=0771234567</code></td>
+          </tr>
+          <tr>
+            <td>אימות מספר בעזרת זיהוי רנדומלי</td>
+            <td>לא מגדירים מספר קבוע. משתמשים בערך מיוחד.</td>
+            <td><code>callerId=RAND</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>סדר העבודה המומלץ</h2>
+      <ol class="steps">
+        <li>
+          <div>
+            <strong>מכינים טוקן API.</strong>
+            <p class="mini">הטוקן הוא האישור שמאפשר לשרת שלך לבצע פעולות במערכת.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>מחליטים למי שולחים.</strong>
+            <p class="mini">מספרים ישירים, רשימת תפוצה <code>tpl</code>, או רשימת צינתוקים חינמיים <code>tzl</code>.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>אם משתמשים ברשימה, יוצרים אותה במערכת ימות.</strong>
+            <p class="mini">אחר כך לוקחים את מספר הרשימה ומשתמשים בו בפרמטר <code>phones</code>.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>שולחים קריאת API מהשרת שלך.</strong>
+            <p class="mini">השרת פונה לכתובת <code>https://www.call2all.co.il/ym/api/RunTzintuk</code>.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>בודקים את התגובה.</strong>
+            <p class="mini">אם התקבל <code>responseStatus=OK</code>, הבקשה התקבלה. אם יש <code>errors</code>, בודקים איזה מספר נכשל ולמה.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>מה המספר שיופיע בצינתוק?</h2>
+      <p>
+        כאן יש בלבול נפוץ, אז חשוב לעשות סדר פשוט:
+      </p>
+      <div class="grid">
+        <div class="box">
+          <span class="tag">למי מתקשרים?</span>
+          <h3><code>phones</code></h3>
+          <p>
+            זה המספר שמקבל את הצינתוק. אם כתבת כאן <code>0500000000</code>,
+            אז הצינתוק יישלח למספר הזה.
+          </p>
+          <pre><code>phones=0500000000</code></pre>
+        </div>
+
+        <div class="box">
+          <span class="tag">מה יופיע על הצג?</span>
+          <h3><code>callerId</code></h3>
+          <p>
+            זה המספר שמופיע אצל האדם שמקבל את הצינתוק. כלומר, זה לא היעד של הצינתוק,
+            אלא הזיהוי שממנו הצינתוק נראה כאילו יצא.
+          </p>
+          <pre><code>callerId=0771234567</code></pre>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>בשפה הכי פשוטה:</strong>
+        <code>phones</code> = למי לצנתק.
+        <br>
+        <code>callerId</code> = איזה מספר יופיע לו על הצג.
+      </div>
+
+      <h3>אם לא מגדירים <code>callerId</code></h3>
+      <p>
+        אם לא שולחים בכלל את הפרמטר <code>callerId</code>, המערכת תשתמש בדרך כלל
+        במספר הראשי של המערכת כזיהוי יוצא.
+      </p>
+
+      <h3>אם רוצים שיופיע מספר מסוים</h3>
+      <p>
+        מוסיפים לקריאה את הפרמטר <code>callerId</code> עם המספר שרוצים שיופיע:
+      </p>
+      <pre><code>callerId=0771234567</code></pre>
+      <p>
+        המספר הזה צריך להיות מספר שמותר למערכת להוציא ממנו שיחות, למשל המספר הראשי,
+        מספר משנה, או מספר שאושר במערכת.
+      </p>
+
+      <h3>אם רוצים מספר אקראי לצורך אימות</h3>
+      <p>
+        משתמשים בערך המיוחד <code>RAND</code>:
+      </p>
+      <pre><code>callerId=RAND</code></pre>
+      <p>
+        במקרה כזה יופיע למקבל הצינתוק מספר אקראי, וה-API יחזיר לשרת את 4 הספרות
+        האחרונות שלו בתוך <code>verifyCode</code>. את 4 הספרות האלה אפשר לבקש מהמשתמש להקיש.
+      </p>
+      <p>
+        המספר האקראי לא נבחר מתוך רשימה שאתה מכניס בפרמטר <code>phones</code>, וגם לא
+        מתוך רשימה רגילה שאתה שולח בקריאת ה-API. זהו זיהוי אקראי שהמערכת של ימות
+        בוחרת בשבילך לצורך האימות.
+      </p>
+      <p>
+        אם אתה רוצה לשלוט בדיוק איזה מספרים יופיעו על הצג, אל תשתמש ב-<code>RAND</code>.
+        במקום זה שלח <code>callerId</code> רגיל, או שלח JSON שבו לכל מספר יעד מוגדר
+        <code>callerId</code> משלו.
+      </p>
+
+      <div class="note warn">
+        <strong>חשוב לדעת:</strong>
+        את המספר שמופיע בצינתוק לא שמים בתוך <code>phones</code>.
+        את המספר שמופיע בצינתוק שמים ב-<code>callerId</code>.
+      </div>
+    </section>
+
+    <section>
+      <h2>הפרמטרים החשובים</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>פרמטר</th>
+            <th>חובה?</th>
+            <th>הסבר פשוט</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>token</code></td>
+            <td>כן</td>
+            <td>הטוקן של המערכת שלך.</td>
+          </tr>
+          <tr>
+            <td><code>phones</code></td>
+            <td>כן</td>
+            <td>למי שולחים את הצינתוק: מספרים, רשימת תפוצה, או רשימת צינתוקים חינמיים.</td>
+          </tr>
+          <tr>
+            <td><code>callerId</code></td>
+            <td>לא</td>
+            <td>איזה מספר יופיע על הצג של מי שמקבל את הצינתוק. אם לא שולחים, המערכת משתמשת בזיהוי הראשי.</td>
+          </tr>
+          <tr>
+            <td><code>TzintukTimeOut</code></td>
+            <td>לא</td>
+            <td>כמה שניות הצינתוק יצלצל. ברירת מחדל 9, מקסימום 16.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>דוגמאות ברורות</h2>
+
+      <h3>דוגמה 1: צינתוק למספר אחד</h3>
+      <p>
+        בדוגמה הזאת <code>0500000000</code> הוא המספר שמקבל את הצינתוק.
+        לא הגדרנו <code>callerId</code>, ולכן יופיע בדרך כלל המספר הראשי של המערכת.
+      </p>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=0500000000</code></pre>
+
+      <h3>דוגמה 2: צינתוק לכמה מספרים</h3>
+      <p>
+        כאן כל המספרים שבתוך <code>phones</code> יקבלו צינתוק.
+      </p>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=0500000000:0520000000:0530000000</code></pre>
+
+      <h3>דוגמה 3: צינתוק עם זמן צלצול של 12 שניות</h3>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=0500000000&TzintukTimeOut=12</code></pre>
+
+      <h3>דוגמה 4: צינתוק לרשימת צינתוקים חינמיים</h3>
+      <p>
+        את הרשימה עצמה יוצרים במערכת ימות. אחרי שיש לך את מספר הרשימה, למשל 100,
+        שולחים כך:
+      </p>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=tzl:100</code></pre>
+
+      <h3>דוגמה 5: צינתוק לכמה רשימות צינתוקים חינמיים</h3>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=tzl:100,200,300</code></pre>
+      <p class="mini">לפי התיעוד, אפשר לשלוח עד 50 רשימות בקריאה אחת.</p>
+
+      <h3>דוגמה 6: צינתוק לרשימת תפוצה</h3>
+      <p>
+        אם קיימת במערכת רשימת תפוצה שמספרה 123:
+      </p>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=tpl:123</code></pre>
+
+      <h3>דוגמה 7: צינתוק עם זיהוי יוצא מסוים</h3>
+      <p>
+        בדוגמה הזאת <code>0500000000</code> מקבל את הצינתוק,
+        ועל הצג שלו יופיע <code>0771234567</code>.
+      </p>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&callerId=0771234567&phones=0500000000</code></pre>
+
+      <h3>דוגמה 8: אימות מספר בעזרת זיהוי רנדומלי</h3>
+      <p>
+        בדוגמה הזאת <code>0500000000</code> מקבל צינתוק ממספר אקראי.
+      </p>
+      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&callerId=RAND&phones=0500000000</code></pre>
+      <p>
+        במקרה כזה התגובה תחזיר <code>verifyCode</code>. זהו קוד של 4 ספרות אחרונות
+        של המספר שממנו יצאה השיחה. אפשר לבקש מהלקוח להקליד את 4 הספרות ולאמת מול הערך שהשרת החזיר.
+      </p>
+    </section>
+
+    <section>
+      <h2>דוגמה לקוד בשרת</h2>
+      <p>
+        זו דוגמה בסיסית ב-JavaScript לשרת Node.js. בפועל עדיף לשמור את הטוקן במשתנה סביבה
+        ולא לכתוב אותו גלוי בתוך הקוד.
+      </p>
+      <pre><code>const token = process.env.YEMOT_TOKEN;
+const phone = "0500000000";
+
+const url = new URL("https://www.call2all.co.il/ym/api/RunTzintuk");
+url.searchParams.set("token", token);
+url.searchParams.set("phones", phone);
+url.searchParams.set("TzintukTimeOut", "9");
+
+const response = await fetch(url);
+const result = await response.json();
+
+if (result.responseStatus === "OK") {
+  console.log("הצינתוק נשלח", result);
+} else {
+  console.log("שגיאה בשליחת הצינתוק", result);
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>איך נראית תגובה מהשרת?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>שדה</th>
+            <th>משמעות</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>responseStatus</code></td>
+            <td>אם הפעולה הצליחה, בדרך כלל יופיע <code>OK</code>.</td>
+          </tr>
+          <tr>
+            <td><code>verifyCode</code></td>
+            <td>מתמלא רק כאשר משתמשים ב-<code>callerId=RAND</code>.</td>
+          </tr>
+          <tr>
+            <td><code>callerId</code></td>
+            <td>הזיהוי שממנו יצאה השיחה.</td>
+          </tr>
+          <tr>
+            <td><code>callsCount</code></td>
+            <td>כמה שיחות צינתוק יצאו בפועל.</td>
+          </tr>
+          <tr>
+            <td><code>bilingPerCall</code></td>
+            <td>חיוב לכל שיחה.</td>
+          </tr>
+          <tr>
+            <td><code>biling</code></td>
+            <td>סך החיוב.</td>
+          </tr>
+          <tr>
+            <td><code>errors</code></td>
+            <td>מספרים שנכשלו והסיבה, למשל חסום, כפול, או מספר לא תקין.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>דוגמה לשגיאות</h3>
+      <pre><code>{
+  "05832XXXXX": "blocked",
+  "0773137770": "double",
+  "*8080": "notValid"
+}</code></pre>
+    </section>
+
+    <section>
+      <h2>סיכום קצר</h2>
+      <div class="note">
+        <p>
+          <strong>אם אתה שולח למספרים רגילים:</strong>
+          אין כמעט מה להגדיר במערכת. פשוט שולחים קריאת API מהשרת עם <code>phones</code>.
+        </p>
+        <p>
+          <strong>אם אתה שולח לרשימת צינתוקים חינמיים:</strong>
+          הרשימה עצמה צריכה להיות קיימת במערכת ימות. בקריאת ה-API משתמשים ב-<code>tzl:מספר_רשימה</code>.
+        </p>
+        <p>
+          <strong>אם זה חלק מאתר או מערכת אוטומציה:</strong>
+          הקריאה צריכה לצאת מהשרת שלך, לא מדף HTML פתוח, כדי לא לחשוף את הטוקן.
+        </p>
+      </div>
+      <div class="note danger">
+        <strong>חשוב:</strong>
+        החלף תמיד את <code>TOKEN</code> בטוקן האמיתי שלך, אבל אל תפרסם אותו בדפדפן או בקוד צד-לקוח.
+      </div>
+    </section>
+  </main>
+</body>
+</html>
