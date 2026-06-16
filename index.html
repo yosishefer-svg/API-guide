@@ -124,11 +124,12 @@
     pre {
       direction: ltr;
       text-align: left;
+      position: relative;
       overflow-x: auto;
       background: var(--code-bg);
       color: var(--code-text);
       border-radius: 8px;
-      padding: 16px;
+      padding: 44px 16px 16px;
       margin: 12px 0 18px;
       line-height: 1.55;
       border: 1px solid #1c3f4e;
@@ -139,6 +140,33 @@
       color: inherit;
       padding: 0;
       font-size: 14px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 6px;
+      background: #e6fbff;
+      color: #06343d;
+      cursor: pointer;
+      font-family: Arial, "Noto Sans Hebrew", "Segoe UI", sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      padding: 8px 11px;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .copy-btn:focus-visible {
+      outline: 3px solid rgba(230, 251, 255, 0.65);
+      outline-offset: 2px;
     }
 
     table {
@@ -674,5 +702,34 @@ if (result.responseStatus === "OK") {
       </div>
     </section>
   </main>
+  <script>
+    document.querySelectorAll("pre").forEach((block) => {
+      const button = document.createElement("button");
+      button.className = "copy-btn";
+      button.type = "button";
+      button.textContent = "העתק";
+      button.setAttribute("aria-label", "העתקת הפקודה");
+
+      button.addEventListener("click", async () => {
+        const code = block.querySelector("code");
+        const text = code ? code.innerText : block.innerText;
+
+        try {
+          await navigator.clipboard.writeText(text.trim());
+          button.textContent = "הועתק";
+          window.setTimeout(() => {
+            button.textContent = "העתק";
+          }, 1600);
+        } catch (error) {
+          button.textContent = "לא הועתק";
+          window.setTimeout(() => {
+            button.textContent = "העתק";
+          }, 1600);
+        }
+      });
+
+      block.appendChild(button);
+    });
+  </script>
 </body>
 </html>
