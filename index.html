@@ -54,7 +54,19 @@
     .intro-item:nth-child(3) { border-color: var(--red); }
     .intro-item h2 { margin: 0 0 5px; font-size: 19px; }
     .intro-item p { margin: 0; color: var(--muted); }
+    .intro-item code, .env-balloon code { overflow-wrap: anywhere; word-break: break-word; white-space: normal; }
     .security-note { margin: 22px 0 0; padding: 13px 15px; background: #fff4d8; border: 1px solid #ead397; border-radius: 7px; }
+    .security-note p { margin: 0; }
+    .env-help { position: relative; margin-top: 12px; }
+    .env-help summary { width: fit-content; cursor: pointer; color: var(--blue-dark); font-weight: 800; list-style: none; text-decoration: underline; text-underline-offset: 3px; }
+    .env-help summary::-webkit-details-marker { display: none; }
+    .env-help summary::before { content: "?"; display: inline-grid; place-items: center; width: 21px; height: 21px; margin-inline-end: 6px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 13px; text-decoration: none; }
+    .env-balloon { position: relative; max-width: 780px; margin-top: 13px; padding: 17px 18px; background: #fff; border: 1px solid #b9cad8; border-radius: 7px; box-shadow: 0 10px 24px rgba(20, 48, 69, 0.12); }
+    .env-balloon::before { content: ""; position: absolute; top: -8px; inset-inline-start: 26px; width: 14px; height: 14px; background: #fff; border-top: 1px solid #b9cad8; border-inline-start: 1px solid #b9cad8; transform: rotate(45deg); }
+    .env-balloon h3 { margin: 0 0 8px; font-size: 18px; }
+    .env-balloon p { margin: 0 0 9px; }
+    .env-balloon ol { margin: 8px 0 12px; }
+    .env-example { display: grid; gap: 7px; padding: 12px; background: var(--surface-soft); border-radius: 6px; }
 
     .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 32px; padding: 30px 0 60px; direction: ltr; }
     .sidebar, main { direction: rtl; }
@@ -136,7 +148,28 @@
         <div class="intro-item"><h2>איפה מגדירים?</h2><p>הפעולה נשלחת בדרך כלל מהשרת שלך. קבצים, שלוחות, רשימות ומספרים עצמם נמצאים במערכת הטלפונית.</p></div>
         <div class="intro-item"><h2>איך בנויה כתובת?</h2><p>לכל פקודת API יש כתובת משלה. הכתובת מתחילה ב־<code>https://www.call2all.co.il/ym/api/</code>, ובסופה מוסיפים את שם הפקודה. לדוגמה: <code>https://www.call2all.co.il/ym/api/RunTzintuk</code>.</p></div>
       </div>
-      <p class="security-note"><strong>אבטחה:</strong> אין לפרסם טוקן אמיתי בדף HTML ציבורי. באתר אמיתי שולחים את הבקשות מהשרת ושומרים את הטוקן במשתנה סביבה.</p>
+      <div class="security-note">
+        <p><strong>אבטחה:</strong> אין לפרסם טוקן אמיתי בדף HTML ציבורי. באתר אמיתי שולחים את הבקשות מהשרת ושומרים את הטוקן במשתנה סביבה.</p>
+        <details class="env-help">
+          <summary>מה זה משתנה סביבה?</summary>
+          <div class="env-balloon">
+            <h3>מקום סודי להגדרות של השרת</h3>
+            <p>משתנה סביבה הוא ערך ששמור בהגדרות השרת, מחוץ לקובצי האתר הציבוריים. הקוד יודע לקרוא אותו, אבל מי שפותח את האתר בדפדפן לא רואה אותו.</p>
+            <p><strong>במקרה שלנו:</strong> במקום לכתוב את הטוקן האמיתי בתוך הקוד, נותנים לו שם, למשל <code>YEMOT_TOKEN</code>, ושומרים את הערך האמיתי בלוח הניהול של השרת.</p>
+            <ol>
+              <li>נכנסים ללוח הניהול של שירות האחסון.</li>
+              <li>מחפשים אזור בשם <code>Environment Variables</code>, <code>Variables</code> או <code>Secrets</code>.</li>
+              <li>יוצרים משתנה בשם <code>YEMOT_TOKEN</code> ומדביקים בו את הטוקן האמיתי.</li>
+              <li>בקוד קוראים את המשתנה בלי לכתוב את הטוקן עצמו.</li>
+            </ol>
+            <div class="env-example">
+              <strong>דוגמה ב־Node.js:</strong>
+              <code>const token = process.env.YEMOT_TOKEN;</code>
+            </div>
+            <p><strong>חשוב:</strong> GitHub Pages מציג HTML בלבד ואין בו שרת ששומר סודות. לכן אסור להכניס טוקן אמיתי למדריך או לקוד JavaScript שרץ בדפדפן.</p>
+          </div>
+        </details>
+      </div>
     </div>
   </div>
 
