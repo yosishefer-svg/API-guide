@@ -134,7 +134,7 @@
       <div class="intro-grid">
         <div class="intro-item"><h2>מה זה API?</h2><p>דרך שבה אתר, שרת או מערכת אוטומציה שולחים פקודה למערכת הטלפונית ומקבלים תשובה.</p></div>
         <div class="intro-item"><h2>איפה מגדירים?</h2><p>הפעולה נשלחת בדרך כלל מהשרת שלך. קבצים, שלוחות, רשימות ומספרים עצמם נמצאים במערכת הטלפונית.</p></div>
-        <div class="intro-item"><h2>איך בנויה כתובת?</h2><p><code>https://www.call2all.co.il/ym/api/COMMAND</code> ובבקשה מצרפים טוקן ופרמטרים.</p></div>
+        <div class="intro-item"><h2>איך בנויה כתובת?</h2><p>אחרי <code>/api/</code> כותבים את שם הפקודה האמיתית. לדוגמה: <code>https://www.call2all.co.il/ym/api/RunTzintuk</code>.</p></div>
       </div>
       <p class="security-note"><strong>אבטחה:</strong> אין לפרסם טוקן אמיתי בדף HTML ציבורי. באתר אמיתי שולחים את הבקשות מהשרת ושומרים את הטוקן במשתנה סביבה.</p>
     </div>
@@ -177,6 +177,7 @@
       <code class="command-name">GetTextFile</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> קורא קובץ טקסט מתוך המערכת ומחזיר את התוכן והפרטים שלו.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -289,6 +290,7 @@
       <code class="command-name">UploadTextFile</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> יוצר קובץ טקסט חדש או מחליף את כל התוכן בקובץ קיים.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -339,6 +341,7 @@
       <code class="command-name">UpdateExtension</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מעדכן ערכים מסוימים ב-ext.ini בלי למחוק את שאר הגדרות השלוחה.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -389,6 +392,7 @@
       <code class="command-name">CallAction</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מעביר מאזין שנמצא כרגע בשיחה לשלוחה אחרת או מנתק אותו.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -466,6 +470,7 @@
       <code class="command-name">CallAction</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מבצע פעולות על משתתף בחדר ועידה: הוצאה, השתקה, הרמת יד, שינוי יעד ועוד.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -796,6 +801,7 @@
       <code class="command-name">CallAction</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> משנה את שפת ההודעות עבור שיחה פעילה מסוימת.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -876,6 +882,7 @@
       <code class="command-name">GetIncomingSum</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר סיכום דקות נכנסות למערכת לפי טווח תאריכים.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -966,6 +973,7 @@
       <code class="command-name">GetSmsOutLog</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר את הודעות ה-SMS שיצאו מהמערכת ואת סטטוס המסירה שלהן.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -1122,12 +1130,10 @@
       <code class="command-name">Security API</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> אוסף שירותים לבדיקת טוקן, אימות דו-שלבי, לוג התחברויות וניהול סשנים.</p>
+
     <div class="endpoint-line">
-      <span>כתובת הפקודה</span>
-      <div class="endpoint-value">
-        <code>https://www.call2all.co.il/ym/api/COMMAND</code>
-        <button class="endpoint-copy" type="button">העתק כתובת</button>
-      </div>
+      <span>כתובות הפקודות</span>
+      <p>בפרק הזה יש כמה פקודות שונות. הכתובת המדויקת מופיעה לצד כל פעולה בהמשך הפרק.</p>
     </div>
     <div class="source-doc">
       <p>תיעוד API לגישה לאירועי האבטחה של המערכת של המערכת.</p>
@@ -1810,6 +1816,7 @@ KillAllSessions // סגירת כל הסשנים הפעילים
       <code class="command-name">RunTzintuk</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> שולח צינתוק למספרים, לרשימות תפוצה או לרשימות צינתוקים חינמיים.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -1997,6 +2004,7 @@ KillAllSessions // סגירת כל הסשנים הפעילים
       <code class="command-name">TzintukimListManagement</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מציג, יוצר, מאפס ומנהל מנויים ברשימות הצינתוקים החינמיים.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -2286,6 +2294,7 @@ ResetToListTzintuk // הרשימה אופסה
       <code class="command-name">SendFax</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> שולח קובץ PDF כמסמך פקס ומאפשר לקבל עדכון על תוצאת המסירה.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -2422,6 +2431,7 @@ ResetToListTzintuk // הרשימה אופסה
       <code class="command-name">CheckIfFileExists</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> בודק אם קובץ מסוים קיים במערכת לפי הנתיב שלו.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -2506,6 +2516,7 @@ path=ivr/4/ext.ini
       <code class="command-name">SendSms</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> שולח הודעת SMS עם זיהוי מספרי או טקסטואלי בהתאם להרשאות המערכת.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -2621,6 +2632,7 @@ path=ivr/4/ext.ini
       <code class="command-name">CreateBridgeCall</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מחייג לשני צדדים ומחבר ביניהם בשיחת גישור.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -2794,6 +2806,7 @@ SendMailInCall=0
       <code class="command-name">GetQueueRealTime</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר את מצב שלוחת התור והנציגים בזמן אמת.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -3015,6 +3028,7 @@ SendMailInCall=0
       <code class="command-name">GetCustomerData</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר את המספר הראשי, מספרים משניים, זיהויים ומידע כללי על המערכת.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -3282,6 +3296,7 @@ SendMailInCall=0
       <code class="command-name">ViewCampaignReports</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר נתוני קמפיין וחיובים עבור קמפיינים נתמכים.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -3368,6 +3383,7 @@ SendMailInCall=0
       <code class="command-name">ValidationCallerId</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> מוסיף ומאמת מספר שיוכל לשמש כזיהוי יוצא במערכת.</p>
+
     <div class="endpoint-line">
       <span>כתובת הפקודה</span>
       <div class="endpoint-value">
@@ -3510,12 +3526,10 @@ SendMailInCall=0
       <code class="command-name">Tasks API</code>
     </div>
     <p class="plain-summary"><strong>במילים פשוטות:</strong> יוצר, מציג, מעדכן ומוחק משימות מתוזמנות במערכת.</p>
+
     <div class="endpoint-line">
-      <span>כתובת הפקודה</span>
-      <div class="endpoint-value">
-        <code>https://www.call2all.co.il/ym/api/COMMAND</code>
-        <button class="endpoint-copy" type="button">העתק כתובת</button>
-      </div>
+      <span>כתובות הפקודות</span>
+      <p>בפרק הזה יש כמה פקודות שונות. הכתובת המדויקת מופיעה לצד כל פעולה בהמשך הפרק.</p>
     </div>
     <div class="source-doc">
       <p>שימו לב, לע"ע לא יכול להיות מעל  10 משימות פעילות בכל לקוח.</p>
