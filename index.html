@@ -3,705 +3,4190 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>מדריך פשוט להפעלת צינתוק דרך API</title>
+  <meta name="description" content="מדריך API פשוט ומלא למערכות ימות המשיח">
+  <title>API למערכות ימות המשיח - מדריך מלא</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f7f8fb;
+      --page: #f5f7fa;
       --surface: #ffffff;
-      --surface-2: #eef3f7;
-      --text: #16202a;
-      --muted: #5a6875;
-      --line: #d8e0e8;
-      --accent: #087f8c;
-      --accent-2: #7a5c00;
-      --danger: #9f2f2f;
+      --surface-soft: #eef4f8;
+      --text: #17212b;
+      --muted: #586876;
+      --line: #d7e0e8;
+      --blue: #1261a6;
+      --blue-dark: #0b3d6b;
+      --teal: #087f8c;
+      --yellow: #f3c969;
+      --red: #a53b3b;
       --code-bg: #10212b;
       --code-text: #edf7fb;
-      --shadow: 0 14px 34px rgba(18, 32, 43, 0.09);
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 20px; }
     body {
       margin: 0;
-      background: var(--bg);
+      background: var(--page);
       color: var(--text);
       font-family: Arial, "Noto Sans Hebrew", "Segoe UI", sans-serif;
       line-height: 1.75;
     }
-
+    a { color: var(--blue); }
     header {
-      background: #1261a6;
+      background: var(--blue);
       color: #fff;
-      padding: 42px 20px 34px;
+      padding: 44px 24px 38px;
     }
-
-    .wrap {
-      width: min(1080px, calc(100% - 32px));
+    .header-inner, .layout, .intro-inner {
+      width: min(1260px, calc(100% - 32px));
       margin: 0 auto;
     }
+    .eyebrow { margin: 0 0 8px; color: #d9eeff; font-weight: 800; }
+    h1 { margin: 0; font-size: clamp(34px, 5vw, 54px); line-height: 1.15; letter-spacing: 0; }
+    .lead { max-width: 850px; margin: 16px 0 0; color: #e9f5ff; font-size: 19px; }
 
-    .eyebrow {
-      margin: 0 0 10px;
-      color: #b7dce2;
-      font-weight: 700;
-      font-size: 15px;
+    .intro-band { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .intro-inner { padding: 28px 0; }
+    .intro-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    .intro-item { border-inline-start: 4px solid var(--teal); padding-inline-start: 15px; }
+    .intro-item:nth-child(2) { border-color: var(--yellow); }
+    .intro-item:nth-child(3) { border-color: var(--red); }
+    .intro-item h2 { margin: 0 0 5px; font-size: 19px; }
+    .intro-item p { margin: 0; color: var(--muted); }
+    .security-note { margin: 22px 0 0; padding: 13px 15px; background: #fff4d8; border: 1px solid #ead397; border-radius: 7px; }
+
+    .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 32px; padding: 30px 0 60px; direction: ltr; }
+    .sidebar, main { direction: rtl; }
+    .sidebar { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; padding: 0 8px 20px; }
+    .search-label { display: block; margin-bottom: 7px; font-weight: 800; }
+    #guide-search { width: 100%; border: 1px solid #b8c7d3; border-radius: 7px; background: #fff; color: var(--text); font: inherit; padding: 10px 12px; }
+    #guide-search:focus { outline: 3px solid rgba(18, 97, 166, 0.2); border-color: var(--blue); }
+    .nav-group { margin-top: 22px; }
+    .nav-group h3 { margin: 0 0 7px; color: var(--muted); font-size: 14px; }
+    .nav-group a { display: grid; gap: 1px; padding: 7px 9px; border-inline-start: 3px solid transparent; color: var(--text); text-decoration: none; font-size: 14px; }
+    .nav-group a:hover { background: #e7f1f8; border-color: var(--blue); }
+    .nav-group a code { color: var(--muted); font-size: 12px; }
+
+    main { min-width: 0; background: var(--surface); border: 1px solid var(--line); }
+    .api-section { padding: 32px; border-bottom: 1px solid var(--line); }
+    .api-section:last-child { border-bottom: 0; }
+    .api-section[hidden] { display: none; }
+    .section-heading { display: flex; align-items: start; justify-content: space-between; gap: 18px; }
+    .section-group { margin: 0 0 3px; color: var(--teal); font-size: 14px; font-weight: 800; }
+    .api-section h2 { margin: 0; font-size: 28px; line-height: 1.3; }
+    .api-section h3 { margin: 27px 0 8px; font-size: 21px; }
+    .api-section h4 { margin: 21px 0 7px; font-size: 17px; }
+    .command-name { flex: 0 0 auto; background: #dceefb; color: #0a426f; border: 1px solid #b5d5ec; padding: 7px 10px; font-weight: 800; }
+    .plain-summary { margin: 18px 0; padding: 13px 15px; background: #edf8f8; border-inline-start: 5px solid var(--teal); }
+    .endpoint-line { display: grid; gap: 5px; margin: 0 0 22px; }
+    .endpoint-line span { color: var(--muted); font-size: 13px; font-weight: 800; }
+    .endpoint-value { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .endpoint-line code { width: fit-content; max-width: 100%; overflow-wrap: anywhere; }
+    .endpoint-copy { border: 1px solid #9eb9ce; border-radius: 6px; background: #fff; color: var(--blue-dark); cursor: pointer; font: 800 13px Arial, sans-serif; padding: 7px 10px; }
+    .endpoint-copy:hover { background: #eaf4fb; }
+    .source-doc > p:first-child { margin-top: 0; }
+    p { margin: 0 0 12px; }
+    ul, ol { padding-inline-start: 24px; }
+    hr { border: 0; border-top: 1px solid var(--line); margin: 25px 0; }
+    blockquote { margin: 16px 0; padding: 12px 15px; background: #fff6df; border-inline-start: 5px solid var(--yellow); }
+    code { direction: ltr; unicode-bidi: embed; background: #e8eef3; color: #10212b; border-radius: 5px; padding: 2px 6px; font-family: Consolas, "Courier New", monospace; font-size: 0.94em; }
+    pre { direction: ltr; text-align: left; position: relative; overflow-x: auto; background: var(--code-bg); color: var(--code-text); border-radius: 7px; padding: 44px 16px 16px; margin: 12px 0 18px; line-height: 1.55; border: 1px solid #1c3f4e; }
+    pre code { background: transparent; color: inherit; padding: 0; font-size: 14px; white-space: pre; }
+    .copy-btn { position: absolute; top: 8px; right: 8px; border: 1px solid rgba(255,255,255,.3); border-radius: 6px; background: #e6fbff; color: #06343d; cursor: pointer; font: 800 13px Arial, sans-serif; padding: 8px 11px; }
+    .copy-btn:hover { background: #fff; }
+    .copy-btn:focus-visible { outline: 3px solid rgba(230,251,255,.65); outline-offset: 2px; }
+    .table-scroll { width: 100%; overflow-x: auto; margin: 12px 0 20px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; background: #fff; min-width: 620px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); border-inline-end: 1px solid var(--line); text-align: right; vertical-align: top; }
+    th { background: var(--surface-soft); font-weight: 800; }
+    tr:last-child td { border-bottom: 0; }
+    .empty-state { display: none; padding: 30px; text-align: center; color: var(--muted); }
+    .empty-state.visible { display: block; }
+
+    @media (max-width: 900px) {
+      .intro-grid { grid-template-columns: 1fr; }
+      .layout { display: block; }
+      .sidebar { position: static; max-height: none; margin-bottom: 24px; padding: 0; }
+      .nav-group { display: none; }
+      .api-section { padding: 25px 20px; }
     }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(30px, 5vw, 48px);
-      line-height: 1.2;
-      letter-spacing: 0;
-    }
-
-    .lead {
-      max-width: 780px;
-      margin: 18px 0 0;
-      color: #d8edf1;
-      font-size: 19px;
-    }
-
-    main {
-      padding: 30px 0 50px;
-    }
-
-    section {
-      margin: 22px 0;
-      padding: 26px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-    }
-
-    h2 {
-      margin: 0 0 14px;
-      font-size: 26px;
-      line-height: 1.3;
-    }
-
-    h3 {
-      margin: 22px 0 8px;
-      font-size: 20px;
-    }
-
-    p {
-      margin: 0 0 12px;
-    }
-
-    ul,
-    ol {
-      margin: 8px 0 0;
-      padding-inline-start: 24px;
-    }
-
-    li {
-      margin: 6px 0;
-    }
-
-    code {
-      direction: ltr;
-      unicode-bidi: embed;
-      background: #e8eef3;
-      color: #10212b;
-      border-radius: 5px;
-      padding: 2px 6px;
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.95em;
-    }
-
-    header code {
-      background: #e6fbff;
-      color: #06343d;
-      border: 1px solid rgba(255, 255, 255, 0.58);
-      font-weight: 800;
-    }
-
-    pre {
-      direction: ltr;
-      text-align: left;
-      position: relative;
-      overflow-x: auto;
-      background: var(--code-bg);
-      color: var(--code-text);
-      border-radius: 8px;
-      padding: 44px 16px 16px;
-      margin: 12px 0 18px;
-      line-height: 1.55;
-      border: 1px solid #1c3f4e;
-    }
-
-    pre code {
-      background: transparent;
-      color: inherit;
-      padding: 0;
-      font-size: 14px;
-    }
-
-    .copy-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      border-radius: 6px;
-      background: #e6fbff;
-      color: #06343d;
-      cursor: pointer;
-      font-family: Arial, "Noto Sans Hebrew", "Segoe UI", sans-serif;
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1;
-      padding: 8px 11px;
-      transition: background 0.15s ease, transform 0.15s ease;
-    }
-
-    .copy-btn:hover {
-      background: #ffffff;
-      transform: translateY(-1px);
-    }
-
-    .copy-btn:focus-visible {
-      outline: 3px solid rgba(230, 251, 255, 0.65);
-      outline-offset: 2px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 12px 0 4px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th,
-    td {
-      padding: 11px 12px;
-      border-bottom: 1px solid var(--line);
-      text-align: right;
-      vertical-align: top;
-    }
-
-    th {
-      background: var(--surface-2);
-      font-weight: 800;
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .box {
-      background: #f9fbfc;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 18px;
-    }
-
-    .box h3 {
-      margin-top: 0;
-    }
-
-    .tag {
-      display: inline-block;
-      margin: 0 0 10px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      background: #dff2f4;
-      color: #075f68;
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .note {
-      border-inline-start: 5px solid var(--accent);
-      background: #eef8fa;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin: 14px 0;
-    }
-
-    .warn {
-      border-inline-start-color: var(--accent-2);
-      background: #fff8e6;
-    }
-
-    .danger {
-      border-inline-start-color: var(--danger);
-      background: #fff1f1;
-    }
-
-    .steps {
-      counter-reset: step;
-      padding: 0;
-      list-style: none;
-    }
-
-    .steps li {
-      counter-increment: step;
-      display: grid;
-      grid-template-columns: 38px 1fr;
-      gap: 12px;
-      align-items: start;
-      margin: 14px 0;
-    }
-
-    .steps li::before {
-      content: counter(step);
-      display: grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .mini {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    @media (max-width: 760px) {
-      header {
-        padding-top: 30px;
-      }
-
-      section {
-        padding: 20px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
+    @media (max-width: 620px) {
+      header { padding: 32px 18px; }
+      .header-inner, .layout, .intro-inner { width: min(100% - 24px, 1260px); }
+      .section-heading { display: block; }
+      .command-name { display: inline-block; margin-top: 12px; }
+      .api-section h2 { font-size: 24px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="wrap">
-      <p class="eyebrow">API של ימות המשיח</p>
-      <h1>הפעלת צינתוק בצורה פשוטה וברורה</h1>
-      <p class="lead">
-        מדריך מעשי לפיצ'ר <code>RunTzintuk</code>: מה מגדירים במערכת הטלפונית,
-        מה מגדירים בשרת, ואיך נראית קריאת API בפועל.
-      </p>
+    <div class="header-inner">
+      <p class="eyebrow">מדריך מעשי למפתחים ולמתחילים</p>
+      <h1>API למערכות ימות המשיח</h1>
+      <p class="lead">כל הפקודות מהעמוד המרוכזות במקום אחד, עם הסבר פשוט, פרמטרים, תגובות שרת ודוגמאות שניתן להעתיק.</p>
     </div>
   </header>
 
-  <main class="wrap">
-    <section>
-      <h2>מה הפיצ'ר הזה עושה?</h2>
-      <p>
-        הפקודה <code>RunTzintuk</code> מפעילה צינתוק למספר טלפון אחד, לכמה מספרים,
-        לרשימת תפוצה, או לרשימת צינתוקים חינמיים.
-      </p>
-      <p>
-        צינתוק הוא שיחה קצרה שיוצאת למנוי ומתנתקת אחרי מספר שניות. אפשר להשתמש בזה
-        להתראות, אישורי פעולה, תזכורות, או אימות מספר טלפון.
-      </p>
-      <div class="note">
-        <strong>השורה החשובה:</strong>
-        את הצינתוק לא "מגדירים בשלוחה" כמו תפריט רגיל. מפעילים אותו על ידי קריאת API
-        לשרת של ימות המשיח.
+  <div class="intro-band">
+    <div class="intro-inner">
+      <div class="intro-grid">
+        <div class="intro-item"><h2>מה זה API?</h2><p>דרך שבה אתר, שרת או מערכת אוטומציה שולחים פקודה למערכת הטלפונית ומקבלים תשובה.</p></div>
+        <div class="intro-item"><h2>איפה מגדירים?</h2><p>הפעולה נשלחת בדרך כלל מהשרת שלך. קבצים, שלוחות, רשימות ומספרים עצמם נמצאים במערכת הטלפונית.</p></div>
+        <div class="intro-item"><h2>איך בנויה כתובת?</h2><p><code>https://www.call2all.co.il/ym/api/COMMAND</code> ובבקשה מצרפים טוקן ופרמטרים.</p></div>
       </div>
-    </section>
+      <p class="security-note"><strong>אבטחה:</strong> אין לפרסם טוקן אמיתי בדף HTML ציבורי. באתר אמיתי שולחים את הבקשות מהשרת ושומרים את הטוקן במשתנה סביבה.</p>
+    </div>
+  </div>
 
-    <section>
-      <h2>איפה מגדירים את זה?</h2>
-      <div class="grid">
-        <div class="box">
-          <span class="tag">במערכת הטלפונית / ניהול ימות</span>
-          <h3>מה נמצא בצד של ימות?</h3>
-          <ul>
-            <li>הטוקן או פרטי ההתחברות שמאפשרים גישה ל-API.</li>
-            <li>המספר הראשי של המערכת והמספרים המשניים.</li>
-            <li>רשימת צינתוקים חינמיים, אם רוצים לשלוח עם <code>tzl:LIST</code>.</li>
-            <li>רשימת תפוצה, אם רוצים לשלוח עם <code>tpl:LIST</code>.</li>
-            <li>זיהוי יוצא מאושר, אם לא משתמשים בברירת המחדל.</li>
-          </ul>
-        </div>
+  <div class="layout">
+    <aside class="sidebar" aria-label="תוכן עניינים">
+      <label class="search-label" for="guide-search">חיפוש במדריך</label>
+      <input id="guide-search" type="search" placeholder="למשל: SMS, קובץ, צינתוק">
+      <div class="nav-group"><h3>קבצים ושלוחות</h3><a href="#get-text-file" data-nav-link>קבלת תוכן קובץ טקסט<code>GetTextFile</code></a>
+<a href="#upload-text-file" data-nav-link>העלאת טקסט לקובץ<code>UploadTextFile</code></a>
+<a href="#update-extension" data-nav-link>עדכון הגדרות שלוחה<code>UpdateExtension</code></a>
+<a href="#check-file" data-nav-link>בדיקה אם קובץ קיים<code>CheckIfFileExists</code></a></div>
+<div class="nav-group"><h3>שיחות וחדרי ועידה</h3><a href="#call-action" data-nav-link>הכוונת שיחה פעילה<code>CallAction</code></a>
+<a href="#conference-management" data-nav-link>ניהול חדרי ועידה<code>CallAction</code></a>
+<a href="#channel-language" data-nav-link>שינוי שפה בערוץ שיחה<code>CallAction</code></a>
+<a href="#bridge-call" data-nav-link>הקמת שיחת גישור<code>CreateBridgeCall</code></a>
+<a href="#queue-realtime" data-nav-link>מידע בזמן אמת על תור<code>GetQueueRealTime</code></a></div>
+<div class="nav-group"><h3>דוחות ומידע</h3><a href="#incoming-sum" data-nav-link>סיכום דקות נכנסות<code>GetIncomingSum</code></a>
+<a href="#sms-out-log" data-nav-link>לוג SMS יוצאים<code>GetSmsOutLog</code></a>
+<a href="#customer-data" data-nav-link>מידע על המערכת<code>GetCustomerData</code></a>
+<a href="#campaign-reports" data-nav-link>דוח קמפיין<code>ViewCampaignReports</code></a></div>
+<div class="nav-group"><h3>אבטחה וזיהוי</h3><a href="#security-events" data-nav-link>אירועי אבטחה וסשנים<code>Security API</code></a>
+<a href="#validation-caller-id" data-nav-link>אימות זיהוי יוצא<code>ValidationCallerId</code></a></div>
+<div class="nav-group"><h3>הודעות ותקשורת</h3><a href="#run-tzintuk" data-nav-link>הפעלת צינתוק<code>RunTzintuk</code></a>
+<a href="#tzintuk-lists" data-nav-link>ניהול רשימות צינתוקים<code>TzintukimListManagement</code></a>
+<a href="#send-fax" data-nav-link>שליחת פקס<code>SendFax</code></a>
+<a href="#send-sms" data-nav-link>שליחת SMS<code>SendSms</code></a></div>
+<div class="nav-group"><h3>אוטומציה</h3><a href="#scheduled-tasks" data-nav-link>תזמון משימות<code>Tasks API</code></a></div>
+    </aside>
+    <main>
+      <div class="empty-state" id="empty-state">לא נמצאו פקודות שמתאימות לחיפוש.</div>
 
-        <div class="box">
-          <span class="tag">בשרת / באתר / בקוד שלך</span>
-          <h3>מה נמצא בצד שלך?</h3>
-          <ul>
-            <li>הקוד ששולח בקשת HTTP אל <code>RunTzintuk</code>.</li>
-            <li>המספרים או מספר הרשימה שאליהם רוצים לשלוח.</li>
-            <li>בחירת זמן הצינתוק, אם רוצים לשנות מברירת המחדל.</li>
-            <li>שמירת הטוקן בצורה מאובטחת, למשל בקובץ הגדרות או משתנה סביבה.</li>
-          </ul>
-        </div>
+  <section class="api-section" id="get-text-file" data-search="קבלת תוכן קובץ טקסט GetTextFile קבצים ושלוחות">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">קבצים ושלוחות</p>
+        <h2>קבלת תוכן קובץ טקסט</h2>
       </div>
-
-      <div class="note warn">
-        <strong>לא מומלץ לשים טוקן בתוך דף HTML פתוח ללקוח.</strong>
-        אם מדובר באתר, הקריאה צריכה להישלח מהשרת שלך ולא ישירות מהדפדפן של המשתמש,
-        כדי שהטוקן לא יהיה חשוף.
+      <code class="command-name">GetTextFile</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> קורא קובץ טקסט מתוך המערכת ומחזיר את התוכן והפרטים שלו.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/GetTextFile</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
       </div>
-    </section>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא</strong> - <code>GetTextFile</code></p>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>what</td>
+<td>נתיב מלא כולל שם הקובץ והסיומת</td>
+<td>לדוגמה <code>ivr2:1/ext.ini</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>מאפייני תגובת השרת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>ערך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>contents</td>
+<td>string</td>
+<td>התוכן הכתוב בקובץ</td>
+</tr>
+<tr>
+<td>file</td>
+<td>array</td>
+<td>מערך אובייקטים (ראה להלן)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>תבנית אובייקט:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>ערך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>exists</td>
+<td>boolean</td>
+<td>האם הפעולה בוצעה (במידה וכן, יופיע הערך <code>true</code>. במידה ולא, יופיע הערך <code>false</code>)</td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>שם הקובץ</td>
+</tr>
+<tr>
+<td>uniqueId</td>
+<td>string</td>
+<td>מזהה תנועה ייחודי</td>
+</tr>
+<tr>
+<td>fileType</td>
+<td>string</td>
+<td>סוג קובץ (למשל: <code>INI</code>)</td>
+</tr>
+<tr>
+<td>size</td>
+<td>int</td>
+<td>גודל קובץ</td>
+</tr>
+<tr>
+<td>mtime</td>
+<td>string</td>
+<td>תאריך ושעה שהקובץ השתנה (פורמט: dd/MM/yyyy HH:mm)</td>
+</tr>
+<tr>
+<td>what</td>
+<td>string</td>
+<td>נתיב מלא</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
 
-    <section>
-      <h2>המיקום המדויק של ההגדרות</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>מה רוצים לעשות?</th>
-            <th>איפה מגדירים?</th>
-            <th>מה שמים בקריאת ה-API?</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>לשלוח צינתוק למספרים רגילים</td>
-            <td>בשרת שלך בלבד. אין צורך להגדיר רשימה במערכת.</td>
-            <td><code>phones=0500000000:0520000000</code></td>
-          </tr>
-          <tr>
-            <td>לשלוח לרשימת תפוצה קיימת</td>
-            <td>את רשימת התפוצה יוצרים ומנהלים במערכת ימות.</td>
-            <td><code>phones=tpl:123</code></td>
-          </tr>
-          <tr>
-            <td>לשלוח לרשימת צינתוקים חינמיים</td>
-            <td>את רשימת הצינתוקים החינמיים יוצרים ומנהלים במערכת ימות.</td>
-            <td><code>phones=tzl:100</code></td>
-          </tr>
-          <tr>
-            <td>לשלוח לכמה רשימות צינתוקים חינמיים</td>
-            <td>כל הרשימות צריכות להיות קיימות במערכת ימות.</td>
-            <td><code>phones=tzl:100,200,300</code></td>
-          </tr>
-          <tr>
-            <td>להשתמש בזיהוי יוצא מיוחד</td>
-            <td>הזיהוי צריך להיות מאושר או קיים במערכת ימות.</td>
-            <td><code>callerId=0771234567</code></td>
-          </tr>
-          <tr>
-            <td>אימות מספר בעזרת זיהוי רנדומלי</td>
-            <td>לא מגדירים מספר קבוע. משתמשים בערך מיוחד.</td>
-            <td><code>callerId=RAND</code></td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>סדר העבודה המומלץ</h2>
-      <ol class="steps">
-        <li>
-          <div>
-            <strong>מכינים טוקן API.</strong>
-            <p class="mini">הטוקן הוא האישור שמאפשר לשרת שלך לבצע פעולות במערכת.</p>
-          </div>
-        </li>
-        <li>
-          <div>
-            <strong>מחליטים למי שולחים.</strong>
-            <p class="mini">מספרים ישירים, רשימת תפוצה <code>tpl</code>, או רשימת צינתוקים חינמיים <code>tzl</code>.</p>
-          </div>
-        </li>
-        <li>
-          <div>
-            <strong>אם משתמשים ברשימה, יוצרים אותה במערכת ימות.</strong>
-            <p class="mini">אחר כך לוקחים את מספר הרשימה ומשתמשים בו בפרמטר <code>phones</code>.</p>
-          </div>
-        </li>
-        <li>
-          <div>
-            <strong>שולחים קריאת API מהשרת שלך.</strong>
-            <p class="mini">השרת פונה לכתובת <code>https://www.call2all.co.il/ym/api/RunTzintuk</code>.</p>
-          </div>
-        </li>
-        <li>
-          <div>
-            <strong>בודקים את התגובה.</strong>
-            <p class="mini">אם התקבל <code>responseStatus=OK</code>, הבקשה התקבלה. אם יש <code>errors</code>, בודקים איזה מספר נכשל ולמה.</p>
-          </div>
-        </li>
-      </ol>
-    </section>
-
-    <section>
-      <h2>מה המספר שיופיע בצינתוק?</h2>
-      <p>
-        כאן יש בלבול נפוץ, אז חשוב לעשות סדר פשוט:
-      </p>
-      <div class="grid">
-        <div class="box">
-          <span class="tag">למי מתקשרים?</span>
-          <h3><code>phones</code></h3>
-          <p>
-            זה המספר שמקבל את הצינתוק. אם כתבת כאן <code>0500000000</code>,
-            אז הצינתוק יישלח למספר הזה.
-          </p>
-          <pre><code>phones=0500000000</code></pre>
-        </div>
-
-        <div class="box">
-          <span class="tag">מה יופיע על הצג?</span>
-          <h3><code>callerId</code></h3>
-          <p>
-            זה המספר שמופיע אצל האדם שמקבל את הצינתוק. כלומר, זה לא היעד של הצינתוק,
-            אלא הזיהוי שממנו הצינתוק נראה כאילו יצא.
-          </p>
-          <pre><code>callerId=0771234567</code></pre>
-        </div>
+  <section class="api-section" id="upload-text-file" data-search="העלאת טקסט לקובץ UploadTextFile קבצים ושלוחות">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">קבצים ושלוחות</p>
+        <h2>העלאת טקסט לקובץ</h2>
       </div>
-
-      <div class="note">
-        <strong>בשפה הכי פשוטה:</strong>
-        <code>phones</code> = למי לצנתק.
-        <br>
-        <code>callerId</code> = איזה מספר יופיע לו על הצג.
+      <code class="command-name">UploadTextFile</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> יוצר קובץ טקסט חדש או מחליף את כל התוכן בקובץ קיים.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/UploadTextFile</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
       </div>
+    </div>
+    <div class="source-doc">
+      <p>הערה: במידה והקובץ לא קיים בשלוחה, ייווצר קובץ חדש.</p>
+<p><strong>הפקודה היא</strong> - <code>UploadTextFile</code></p>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>what</td>
+<td>שם הקובץ והסיומת</td>
+<td>יש לציין את הנתיב המלא. לדוגמה <code>ivr2:1/ext.ini</code></td>
+</tr>
+<tr>
+<td>contents</td>
+<td>תוכן הקובץ להעלאה</td>
+<td>במידה וקיים כבר טקסט בקובץ הוא יימחק</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>אין מאפיינים מיוחדים בתגובת השרת</strong></p>
+    </div>
+  </section>
 
-      <h3>אם לא מגדירים <code>callerId</code></h3>
-      <p>
-        אם לא שולחים בכלל את הפרמטר <code>callerId</code>, המערכת תשתמש בדרך כלל
-        במספר הראשי של המערכת כזיהוי יוצא.
-      </p>
-
-      <h3>אם רוצים שיופיע מספר מסוים</h3>
-      <p>
-        מוסיפים לקריאה את הפרמטר <code>callerId</code> עם המספר שרוצים שיופיע:
-      </p>
-      <pre><code>callerId=0771234567</code></pre>
-      <p>
-        המספר הזה צריך להיות מספר שמותר למערכת להוציא ממנו שיחות, למשל המספר הראשי,
-        מספר משנה, או מספר שאושר במערכת.
-      </p>
-
-      <h3>אם רוצים מספר אקראי לצורך אימות</h3>
-      <p>
-        משתמשים בערך המיוחד <code>RAND</code>:
-      </p>
-      <pre><code>callerId=RAND</code></pre>
-      <p>
-        במקרה כזה יופיע למקבל הצינתוק מספר אקראי, וה-API יחזיר לשרת את 4 הספרות
-        האחרונות שלו בתוך <code>verifyCode</code>. את 4 הספרות האלה אפשר לבקש מהמשתמש להקיש.
-      </p>
-      <p>
-        המספר האקראי לא נבחר מתוך רשימה שאתה מכניס בפרמטר <code>phones</code>, וגם לא
-        מתוך רשימה רגילה שאתה שולח בקריאת ה-API. זהו זיהוי אקראי שהמערכת של ימות
-        בוחרת בשבילך לצורך האימות.
-      </p>
-      <p>
-        אם אתה רוצה לשלוט בדיוק איזה מספרים יופיעו על הצג, אל תשתמש ב-<code>RAND</code>.
-        במקום זה שלח <code>callerId</code> רגיל, או שלח JSON שבו לכל מספר יעד מוגדר
-        <code>callerId</code> משלו.
-      </p>
-
-      <div class="note warn">
-        <strong>חשוב לדעת:</strong>
-        את המספר שמופיע בצינתוק לא שמים בתוך <code>phones</code>.
-        את המספר שמופיע בצינתוק שמים ב-<code>callerId</code>.
+  <section class="api-section" id="update-extension" data-search="עדכון הגדרות שלוחה UpdateExtension קבצים ושלוחות">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">קבצים ושלוחות</p>
+        <h2>עדכון הגדרות שלוחה</h2>
       </div>
-    </section>
-
-    <section>
-      <h2>הפרמטרים החשובים</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>פרמטר</th>
-            <th>חובה?</th>
-            <th>הסבר פשוט</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>token</code></td>
-            <td>כן</td>
-            <td>הטוקן של המערכת שלך.</td>
-          </tr>
-          <tr>
-            <td><code>phones</code></td>
-            <td>כן</td>
-            <td>למי שולחים את הצינתוק: מספרים, רשימת תפוצה, או רשימת צינתוקים חינמיים.</td>
-          </tr>
-          <tr>
-            <td><code>callerId</code></td>
-            <td>לא</td>
-            <td>איזה מספר יופיע על הצג של מי שמקבל את הצינתוק. אם לא שולחים, המערכת משתמשת בזיהוי הראשי.</td>
-          </tr>
-          <tr>
-            <td><code>TzintukTimeOut</code></td>
-            <td>לא</td>
-            <td>כמה שניות הצינתוק יצלצל. ברירת מחדל 9, מקסימום 16.</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>דוגמאות ברורות</h2>
-
-      <h3>דוגמה 1: צינתוק למספר אחד</h3>
-      <p>
-        בדוגמה הזאת <code>0500000000</code> הוא המספר שמקבל את הצינתוק.
-        לא הגדרנו <code>callerId</code>, ולכן יופיע בדרך כלל המספר הראשי של המערכת.
-      </p>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=0500000000</code></pre>
-
-      <h3>דוגמה 2: צינתוק לכמה מספרים</h3>
-      <p>
-        כאן כל המספרים שבתוך <code>phones</code> יקבלו צינתוק.
-      </p>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=0500000000:0520000000:0530000000</code></pre>
-
-      <h3>דוגמה 3: צינתוק עם זמן צלצול של 12 שניות</h3>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=0500000000&TzintukTimeOut=12</code></pre>
-
-      <h3>דוגמה 4: צינתוק לרשימת צינתוקים חינמיים</h3>
-      <p>
-        את הרשימה עצמה יוצרים במערכת ימות. אחרי שיש לך את מספר הרשימה, למשל 100,
-        שולחים כך:
-      </p>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=tzl:100</code></pre>
-
-      <h3>דוגמה 5: צינתוק לכמה רשימות צינתוקים חינמיים</h3>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=tzl:100,200,300</code></pre>
-      <p class="mini">לפי התיעוד, אפשר לשלוח עד 50 רשימות בקריאה אחת.</p>
-
-      <h3>דוגמה 6: צינתוק לרשימת תפוצה</h3>
-      <p>
-        אם קיימת במערכת רשימת תפוצה שמספרה 123:
-      </p>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&phones=tpl:123</code></pre>
-
-      <h3>דוגמה 7: צינתוק עם זיהוי יוצא מסוים</h3>
-      <p>
-        בדוגמה הזאת <code>0500000000</code> מקבל את הצינתוק,
-        ועל הצג שלו יופיע <code>0771234567</code>.
-      </p>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&callerId=0771234567&phones=0500000000</code></pre>
-
-      <h3>דוגמה 8: אימות מספר בעזרת זיהוי רנדומלי</h3>
-      <p>
-        בדוגמה הזאת <code>0500000000</code> מקבל צינתוק ממספר אקראי.
-      </p>
-      <pre><code>https://www.call2all.co.il/ym/api/RunTzintuk?token=TOKEN&callerId=RAND&phones=0500000000</code></pre>
-      <p>
-        במקרה כזה התגובה תחזיר <code>verifyCode</code>. זהו קוד של 4 ספרות אחרונות
-        של המספר שממנו יצאה השיחה. אפשר לבקש מהלקוח להקליד את 4 הספרות ולאמת מול הערך שהשרת החזיר.
-      </p>
-    </section>
-
-    <section>
-      <h2>דוגמה לקוד בשרת</h2>
-      <p>
-        זו דוגמה בסיסית ב-JavaScript לשרת Node.js. בפועל עדיף לשמור את הטוקן במשתנה סביבה
-        ולא לכתוב אותו גלוי בתוך הקוד.
-      </p>
-      <pre><code>const token = process.env.YEMOT_TOKEN;
-const phone = "0500000000";
-
-const url = new URL("https://www.call2all.co.il/ym/api/RunTzintuk");
-url.searchParams.set("token", token);
-url.searchParams.set("phones", phone);
-url.searchParams.set("TzintukTimeOut", "9");
-
-const response = await fetch(url);
-const result = await response.json();
-
-if (result.responseStatus === "OK") {
-  console.log("הצינתוק נשלח", result);
-} else {
-  console.log("שגיאה בשליחת הצינתוק", result);
-}</code></pre>
-    </section>
-
-    <section>
-      <h2>איך נראית תגובה מהשרת?</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>שדה</th>
-            <th>משמעות</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>responseStatus</code></td>
-            <td>אם הפעולה הצליחה, בדרך כלל יופיע <code>OK</code>.</td>
-          </tr>
-          <tr>
-            <td><code>verifyCode</code></td>
-            <td>מתמלא רק כאשר משתמשים ב-<code>callerId=RAND</code>.</td>
-          </tr>
-          <tr>
-            <td><code>callerId</code></td>
-            <td>הזיהוי שממנו יצאה השיחה.</td>
-          </tr>
-          <tr>
-            <td><code>callsCount</code></td>
-            <td>כמה שיחות צינתוק יצאו בפועל.</td>
-          </tr>
-          <tr>
-            <td><code>bilingPerCall</code></td>
-            <td>חיוב לכל שיחה.</td>
-          </tr>
-          <tr>
-            <td><code>biling</code></td>
-            <td>סך החיוב.</td>
-          </tr>
-          <tr>
-            <td><code>errors</code></td>
-            <td>מספרים שנכשלו והסיבה, למשל חסום, כפול, או מספר לא תקין.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>דוגמה לשגיאות</h3>
-      <pre><code>{
-  "05832XXXXX": "blocked",
-  "0773137770": "double",
-  "*8080": "notValid"
-}</code></pre>
-    </section>
-
-    <section>
-      <h2>סיכום קצר</h2>
-      <div class="note">
-        <p>
-          <strong>אם אתה שולח למספרים רגילים:</strong>
-          אין כמעט מה להגדיר במערכת. פשוט שולחים קריאת API מהשרת עם <code>phones</code>.
-        </p>
-        <p>
-          <strong>אם אתה שולח לרשימת צינתוקים חינמיים:</strong>
-          הרשימה עצמה צריכה להיות קיימת במערכת ימות. בקריאת ה-API משתמשים ב-<code>tzl:מספר_רשימה</code>.
-        </p>
-        <p>
-          <strong>אם זה חלק מאתר או מערכת אוטומציה:</strong>
-          הקריאה צריכה לצאת מהשרת שלך, לא מדף HTML פתוח, כדי לא לחשוף את הטוקן.
-        </p>
+      <code class="command-name">UpdateExtension</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מעדכן ערכים מסוימים ב-ext.ini בלי למחוק את שאר הגדרות השלוחה.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/UpdateExtension</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
       </div>
-      <div class="note danger">
-        <strong>חשוב:</strong>
-        החלף תמיד את <code>TOKEN</code> בטוקן האמיתי שלך, אבל אל תפרסם אותו בדפדפן או בקוד צד-לקוח.
+    </div>
+    <div class="source-doc">
+      <blockquote>
+<h4><strong>שימו לב! בשונה מהפקודה <code>UploadTextFile</code> כאן המערכת לא מוחקת את הקיים בקובץ <code>ext.ini</code> והדבר היחיד שמשתנה הוא מה שאתם שולחים לשרת</strong></h4>
+</blockquote>
+<p><strong>הפקודה היא</strong> - <code>UpdateExtension</code></p>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור / הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+</tr>
+<tr>
+<td>path</td>
+<td>נתיב</td>
+</tr>
+</tbody>
+</table></div>
+<p>בפרמטרים הנוספים תוכלו לצרף ערכים לעדכון בקובץ <code>ext.ini</code></p>
+<p><strong>לדוגמה:</strong></p>
+<pre><code>${url}UpdateExtension?token=${token}&amp;path=ivr2:1&amp;type=menu&amp;title=בדיקה&amp;enter_id=yes
+</code></pre>
+<p>בדוגמה, עדכון הגדרות לשלוחה 1, סוג השלוחה - תפריט, כינוי השלוחה - בדיקה, תתבצע כניסה לפי מספר אישי.</p>
+<p><strong>אין מאפיינים מיוחדים בתגובת השרת</strong></p>
+<p>הערה: במידה והשלוחה לא קיימת במערכת, תיווצר שלוחה חדשה.</p>
+    </div>
+  </section>
+
+  <section class="api-section" id="call-action" data-search="הכוונת שיחה פעילה CallAction שיחות וחדרי ועידה">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">שיחות וחדרי ועידה</p>
+        <h2>הכוונת שיחה פעילה</h2>
       </div>
-    </section>
-  </main>
+      <code class="command-name">CallAction</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מעביר מאזין שנמצא כרגע בשיחה לשלוחה אחרת או מנתק אותו.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/CallAction</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p>הכוונת שיחה - העברת מאזין ב**אפשרות הראשונה לשלוחה אחרת או לניתוק</p>
+<p>** לא בכל שלב ניתן להעביר את המאזין לשלוחה אחרת באופן מיידי, ולכן הפעולה נשמרת למקום הראשון בו ניתן לעשות את הפעולה</p>
+<p>הפקודה היא - <code>CallAction</code></p>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>action</td>
+<td>set:GOasap=XXXX</td>
+<td>יש להחליף את "XXX" בלאן להעביר את המאזין, נתיב העברה, או "hangup" לניתוק</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>מאפייני תגובת השרת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>calls</td>
+<td>array</td>
+<td>פירוט השיחות שבוצעה בהן פעולה - זהה לתיאור המופיע בפקודה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+</tr>
+<tr>
+<td>action</td>
+<td></td>
+<td>סוג הפעולה שבוצעה</td>
+</tr>
+<tr>
+<td>callsCount</td>
+<td>int</td>
+<td>מספר כולל של שיחות שבוצעה בהן פעולה</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="conference-management" data-search="ניהול חדרי ועידה CallAction שיחות וחדרי ועידה">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">שיחות וחדרי ועידה</p>
+        <h2>ניהול חדרי ועידה</h2>
+      </div>
+      <code class="command-name">CallAction</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מבצע פעולות על משתתף בחדר ועידה: הוצאה, השתקה, הרמת יד, שינוי יעד ועוד.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/CallAction</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <hr />
+<p>הפקודה היא - <code>CallAction</code></p>
+<p>בקריאה ל <code>GetIncomingCalls</code> יש מערך של שיחות של חדרי ועידה, כל הפעולות המפורטות כאן צריכות להיות מבוצעות על הid של המאזין של חדר הועידה - ולא על הID הראשי.</p>
+<p>טיפה הסבר על מערך של שיחות הוועידה:</p>
+<p>דוגמא:</p>
+<p><img src="/assets/uploads/files/1617693275730-4c97d3a2-6790-43f7-93f9-54b428a7bdd9-image.png" alt="4c97d3a2-6790-43f7-93f9-54b428a7bdd9-image.png" /></p>
+<p>נעבור על החלקים החשובים.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>confCalls</td>
+<td>מכיל את מספר המערכת הראשי, ואז <code>-</code> ואז את השלוחה של חדר הועידה</td>
+<td></td>
+</tr>
+<tr>
+<td>mute</td>
+<td>האם הערוץ מושתק</td>
+<td></td>
+</tr>
+<tr>
+<td>hand</td>
+<td>האם יש הרמת אצבע</td>
+<td></td>
+</tr>
+<tr>
+<td>admin</td>
+<td>האם מנהל</td>
+<td></td>
+</tr>
+<tr>
+<td>data['survey']</td>
+<td>מכיל את נתוני הצבעה, במהלך החדר המאזין יכול להקיש על כל הספרות בטלפון שלו וזה משוקף מייד.</td>
+<td>באם אין הקשה הערך לא יופיע</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3>הוספה או הסרה של רכיבים מה path וממערך data.</h3>
+<p>השימוש למשל, כדי לבטל את ההצבעות של המשתשים כדי לאפס את נתוני הסקר.</p>
+<h3>הוספה של ערך:</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>path:add:XXX</td>
+<td>הוספה של נתון בpath, זה גם יופיע במערך <code>data</code> שהובא לעיל</td>
+<td>יש להחליף את XXX בערך, למשל: <code>path:add:survey=7</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<h3>הסרה של ערך:</h3>
+<p>פה ניתן לשלוח רק את ההתחלה של הערך, והוא ירד.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>path:remove:XXX</td>
+<td>הסרה של נתון בpath, זה גם ירד במערך <code>data</code> שהובא לעיל</td>
+<td>יש להחליף את XXX בתחילת ערך, למשל: <code>path:remove:survey=</code>. זה יגרום למחיקה של ערך <code>survey</code> ממערך ה<code>data</code> בכלל - למשל, כדי לאפס נתוני הצבעה.</td>
+</tr>
+</tbody>
+</table></div>
+<p>יש לשים לב, זה לא משפיע על סוג וצורת החדר, למשל, שליחה של <code>path:add:admin</code> לא תגרום למאזין להיות מנהל של החדר.</p>
+<hr />
+<h3>הוצאה מחדר ועידה.</h3>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>action</td>
+<td>kick</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>המאזין הולך ביציאה בדיוק לאן שהיה הולך אם המנהל היה מנתק את החדר או שהוא יהיה יוצר מהחדר אלא אם כן מוגדר בשלוחה, התבאר <a href="https://f2.freeivr.co.il/post/48571">פה</a>.<br />
+ניתן גם להוציא את המאזין לשלוחה ספציפית גם ללא שום הגדרה בשלוחה, ניתן לראות בפוסט זה תחת "כיוון הוצאה מחדר ועידה".</p>
+<hr />
+<h3>השתקת הערוץ:</h3>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>action</td>
+<td>mute</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3>ביטול השתקה של הערוץ:</h3>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>action</td>
+<td>unmute</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3>סימון הורדת יד:</h3>
+<h3>בדומה להורדת אצבע על ידי המאזין בטלפון.</h3>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>action</td>
+<td>lowerhand</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3>סימון הרמת יד:</h3>
+<h3>בדומה להרמת אצבע על ידי המאזין בטלפון.</h3>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>action</td>
+<td>raisehand</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3>כיוון הוצאה מחדר ועידה:</h3>
+<p>יש לפנות לפה לפני שעושים <code>kick</code> על מנת לכוון את המאזין ללכת לשלוחה ספציפית בהוצאה מהחדר. באפשרות זו לא צריך שום הגדרה בשלוחה שתאפשר את היציאה מהחדר, ואם פונים לכאן לפני <code>kick</code> המאזין ילך לאן שהתבקש.</p>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>set:ConfbridgeNewGoto=/XX</td>
+<td>מסמן לאן להעביר את המאזין בביצוע <code>kick</code> מהאתר</td>
+<td>יש לכתוב נתיב להעברה או hangup לניתוק.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<hr />
+<p><strong>מאפייני תגובת השרת בכל הפעולות:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>calls</td>
+<td>array</td>
+<td>פירוט השיחות שבוצעה בהן פעולה - זהה לתיאור המופיע בפקודה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+</tr>
+<tr>
+<td>action</td>
+<td></td>
+<td>סוג הפעולה שבוצעה</td>
+</tr>
+<tr>
+<td>callsCount</td>
+<td>int</td>
+<td>מספר כולל של שיחות שבוצעה בהן פעולה</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="channel-language" data-search="שינוי שפה בערוץ שיחה CallAction שיחות וחדרי ועידה">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">שיחות וחדרי ועידה</p>
+        <h2>שינוי שפה בערוץ שיחה</h2>
+      </div>
+      <code class="command-name">CallAction</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> משנה את שפת ההודעות עבור שיחה פעילה מסוימת.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/CallAction</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p>גובר על ערך language בשלוחה ובivr.ini.</p>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>ids</td>
+<td>מזהה ייחודי של השיחה כפי שהתקבל בקריאה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+<td>ניתן לשרשר כמה שיחות לביצוע על ידי כתיבה  <code>:</code> בין id לid</td>
+</tr>
+<tr>
+<td>action=set:Clanguage=XX</td>
+<td>מסמן את השפה החדשה בערוץ כולו יש להחליף את XX בשפה המבוקשת - כל קודי השפה שיש כמו במערכת עצמה</td>
+<td>השינוי יכנס לתוקף במעבר שלוחה הבא של המאזין.</td>
+</tr>
+</tbody>
+</table></div>
+<p>דוגמה</p>
+<pre><code>CallAction?token=xxxxxxxx&amp;ids=fgdhfszfzvxbdgsxf&amp;action=set:Clanguage=en
+</code></pre>
+<hr />
+<hr />
+<p><strong>מאפייני תגובת השרת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>calls</td>
+<td>array</td>
+<td>פירוט השיחות שבוצעה בהן פעולה - זהה לתיאור המופיע בפקודה <a href="https://f2.freeivr.co.il/post/25141">GetIncomingCalls</a></td>
+</tr>
+<tr>
+<td>action</td>
+<td></td>
+<td>סוג הפעולה שבוצעה</td>
+</tr>
+<tr>
+<td>callsCount</td>
+<td>int</td>
+<td>מספר כולל של שיחות שבוצעה בהן פעולה</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="incoming-sum" data-search="סיכום דקות נכנסות GetIncomingSum דוחות ומידע">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">דוחות ומידע</p>
+        <h2>סיכום דקות נכנסות</h2>
+      </div>
+      <code class="command-name">GetIncomingSum</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר סיכום דקות נכנסות למערכת לפי טווח תאריכים.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/GetIncomingSum</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>GetIncomingSum</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>from</td>
+<td>מאיזה תאריך</td>
+<td>YYYY-mm-dd</td>
+</tr>
+<tr>
+<td>to</td>
+<td>עד איזה תאריך</td>
+<td>YYYY-mm-dd</td>
+</tr>
+<tr>
+<td>בחירת מחדל - אם לא צויין טווח תאריכים - יביא מתחילת החודש הלועזי</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>מאפייני תגובת השרת</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fromDate</td>
+<td>string</td>
+<td>מאיזה תאריך מוצגים הנתונים</td>
+</tr>
+<tr>
+<td>toDate</td>
+<td>string</td>
+<td>עד איזה תאריך מוצגים הנתונים</td>
+</tr>
+<tr>
+<td>direct</td>
+<td>int</td>
+<td><strong>דקות</strong> בחיוג ישיר למערכת</td>
+</tr>
+<tr>
+<td>transferIn</td>
+<td>int</td>
+<td><strong>דקות</strong> <span>מ</span>מערכות אחרות</td>
+</tr>
+<tr>
+<td>transferOut</td>
+<td>int</td>
+<td><strong>דקות</strong> <span>שיצאו</span> למערכות אחרות</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="sms-out-log" data-search="לוג SMS יוצאים GetSmsOutLog דוחות ומידע">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">דוחות ומידע</p>
+        <h2>לוג SMS יוצאים</h2>
+      </div>
+      <code class="command-name">GetSmsOutLog</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר את הודעות ה-SMS שיצאו מהמערכת ואת סטטוס המסירה שלהן.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/GetSmsOutLog</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>GetSmsOutLog</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>limit</td>
+<td>הגבלת תוצאות</td>
+<td>int</td>
+</tr>
+</tbody>
+</table></div>
+<p>בחירת מחדל מביא את כל הסמסים.<br />
+סדר קבלת הסמסים הם מהחדש לישן</p>
+<p><strong>מאפייני תגובת השרת</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rows</td>
+<td>array</td>
+<td>מערך של הסמסים היוצאים</td>
+</tr>
+</tbody>
+</table></div>
+<p>להלן תוכן מערך הסמסים:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CallerId</td>
+<td>string</td>
+<td>זיהוי יוצא</td>
+</tr>
+<tr>
+<td>To</td>
+<td>string</td>
+<td>יעד</td>
+</tr>
+<tr>
+<td>Message</td>
+<td>string</td>
+<td>תוכן ההודעה</td>
+</tr>
+<tr>
+<td>Billing</td>
+<td>int</td>
+<td>עלות ביחידות</td>
+</tr>
+<tr>
+<td>RunBy</td>
+<td>string</td>
+<td>פרטי מבצע הפעולה</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>string</td>
+<td>זמן השליחה</td>
+</tr>
+<tr>
+<td>DeliveryReport</td>
+<td>string</td>
+<td>דוח מסירה</td>
+</tr>
+</tbody>
+</table></div>
+<h3>להלן סוגי סטטוס דוחות מסירה נפוצים לפי תקן <a href="https://smpp.org/smpp-error-codes.html" rel="nofollow ugc">SMPP</a>:</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>null</code></td>
+<td>לא התקבל מידע על מסירת ההודעה</td>
+</tr>
+<tr>
+<td>DELIVRD</td>
+<td>נמסר</td>
+</tr>
+<tr>
+<td>ESME_ROK</td>
+<td>הועבר לשליחה בהצלחה</td>
+</tr>
+<tr>
+<td>EXPIRED</td>
+<td>פג תוקף מעקב המסירה</td>
+</tr>
+<tr>
+<td>ESME_RINVDSTADR</td>
+<td>יעד לא נגיש</td>
+</tr>
+<tr>
+<td>ESME_RINVMSGLEN</td>
+<td>אורך לא חוקי</td>
+</tr>
+<tr>
+<td>ESME_RINVCMDLEN</td>
+<td>אורך פקודה שגוי</td>
+</tr>
+<tr>
+<td>ESME_RMSGQFUL</td>
+<td>תור ההודעות מלא</td>
+</tr>
+<tr>
+<td>ESME_RINVNUMDESTS</td>
+<td>מספר יעדים לא חוקי</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="security-events" data-search="אירועי אבטחה וסשנים Security API אבטחה וזיהוי">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">אבטחה וזיהוי</p>
+        <h2>אירועי אבטחה וסשנים</h2>
+      </div>
+      <code class="command-name">Security API</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> אוסף שירותים לבדיקת טוקן, אימות דו-שלבי, לוג התחברויות וניהול סשנים.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/COMMAND</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p>תיעוד API לגישה לאירועי האבטחה של המערכת של המערכת.</p>
+<p>ה Web Services היבוארו כאן:</p>
+<pre><code>ValidationToken // מידע על הטוקן
+DoubleAuth // ביצוע אימות דו שלבי בטוקן
+GetLoginLog // קבלת לוג ניסיונות התחברות
+GetAllSessions // קבלת סשנים פעילים
+KillSession // סגירת סשן ספציפי
+KillAllSessions // סגירת כל הסשנים הפעילים
+</code></pre>
+<h3><span>הערה חשובה:</span></h3>
+<h4>שימוש בטוקן שהוא שם משתמש וסיסמה של המערכת (077777:1234) לא ממולץ לעבודה עם מתודות שדורשים אימות דו שלבי מכיוון שהאימות הדו שלבי זה ברמת טוקן והתחברות בצורה כזו יוצרת טוקן משתנה.</h4>
+<hr />
+<p><strong>מתודה -</strong> <code>ValidationToken</code><br />
+קבלת מידע על טוקן.</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+</tr>
+</tbody>
+</table></div>
+<p>בתגובת השרת במידה שהטוקן תקין יתקבל מערך בשם <code>tokenData</code> המכיל את המידע הבא:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>remoteIP</td>
+<td>string</td>
+<td>כתובת IP של יוצר הטוקן</td>
+<td>172.18.0.1</td>
+</tr>
+<tr>
+<td>sessionType</td>
+<td>string</td>
+<td>סוג החיבור</td>
+<td>API</td>
+</tr>
+<tr>
+<td>createTime</td>
+<td>string</td>
+<td>זמן יצירה</td>
+<td>2021-07-30 14:38:30</td>
+</tr>
+<tr>
+<td>lastRequest</td>
+<td>string</td>
+<td>שימוש אחרון</td>
+<td>2021-07-30 14:42:31</td>
+</tr>
+<tr>
+<td>doubleAuthStatus</td>
+<td>boolean</td>
+<td>האם החיבור עבר אימות דו-שלבי</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>validationCalls</td>
+<td>int</td>
+<td>כמות שיחות אימות שיצאו ולא אומתו (ערך כללי, לא קשור לחיבור הספציפי)</td>
+<td>3</td>
+</tr>
+<tr>
+<td>token</td>
+<td>string</td>
+<td>רמז של הטוקן</td>
+<td><code>hwe***5J76TM</code></td>
+</tr>
+<tr>
+<td>mfaStatus</td>
+<td>boolean</td>
+<td>סטטוס מעבר אימות דו שלבי גלובלי</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td>mfaRealValid</td>
+<td>boolean</td>
+<td>האם עבר אימות דו שלבי גלובלי  באותו הסשן</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>mfaRequestId</td>
+<td>int</td>
+<td>מזהה בקשת אימות דו שלבי גלובלי של אותו החיבור</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>mfaValidReason</td>
+<td>string</td>
+<td>סיבת מעבר אימות דו-שלבי גלובלי</td>
+<td><code>MFA_PASSED </code></td>
+</tr>
+</tbody>
+</table></div>
+<p>בעיקרון, מה שחשוב לנו לזכור מכאן זה <code>doubleAuthStatus</code> - שמסמן לנו אם הטוקן עבר אימות דו שלבי, ו <code>validationCalls</code> שצריך לשים לב אליו, כי הוא מוגבל - זה יוסבר יותר בהמשך.</p>
+<hr />
+<p><strong>מתודה -</strong> <code>DoubleAuth</code><br />
+ביצוע אימות דו שלבי בטוקן.</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+</tr>
+<tr>
+<td>action</td>
+<td>פעולה: שליחת שיחת אימות או אימות בפועל.</td>
+</tr>
+</tbody>
+</table></div>
+<p>אימות כפול מתבצע ב2 שלבים, מבקשים שיחת אימות, ואז פונים שוב עם קוד האימות לסיים את האימות.</p>
+<p><strong>קבלת שיחה:</strong></p>
+<p>שולחים פרמטר <code>SendCode</code> בערך <code>action</code>.</p>
+<p>תגובה תקינה של השרת:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>message</td>
+<td>string</td>
+<td>הודעת הצלחה</td>
+<td>Call successfully sent</td>
+</tr>
+<tr>
+<td>LastNumberToSend</td>
+<td>string</td>
+<td>4 הספרות האחרונות של המספר <strong>שאליו נשלחה</strong> השיחה</td>
+<td>7770</td>
+</tr>
+</tbody>
+</table></div>
+<p><span>שגיאות אפשרויות:</span><br />
+סוג השגיאה מופיע ב <code>responseStatus</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>סוג שגיאה</th>
+<th>ערך הסברה</th>
+<th>תוכן</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>Missing parameters</td>
+<td>חסרים פרמטרים, או ש <code>action</code> ריק או שהוא מצפה לערך נוסף</td>
+</tr>
+<tr>
+<td>2</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>createPhone is Not Valid. verification is disabled</td>
+<td>מספר יוצר המערכת לא מעודכן או לא מספר תקין, לא ניתן לבצע אימות</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ERROR</td>
+<td>message</td>
+<td>Token has already been verified</td>
+<td>כבר בוצע אימות דו שלבי בטוקן זה.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>ERROR</td>
+<td>message</td>
+<td>Too many validation Calls. Try for a few more hours</td>
+<td>יותר מידי שליחת שיחות במערכת ללא אימות בטווח קצר.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><span>הסבר חשוב בנוגע לשגיאה 4:</span></strong> על מנת למנוע ניצול לרעה שליחת שיחות אימות מוגבלות, כל שליחה של שיחת אימות נספרת, וכל <strong>אימות מוצלח</strong> מוריד ספירה.<br />
+זה אומר, שאם תבצעו אימות מוצלח  ושיחה אחד בלבד זה לא יחשב בתור שיחה, אבל אם תשלחו 4 שיחות אימות ורק אז יתבצע אימות אז יספר 3 שיחות שיצאו ללא צורך.</p>
+<p>ניתן לראות את המונה שיחות של המערכת בפניה ל <code>ValidationToken</code>.<br />
+המונה מתאפס כל <strong>כ</strong>6 שעות.</p>
+<p><strong>ביצוע אימות בפועל:</strong></p>
+<p>שולחים פרמטר <code>VerifyCode</code> בערך <code>action</code> ואת 4 הספרות של המספר שקיבלתם ממנו את השיחה בערך <code>code</code>.</p>
+<p>תגובה תקינה של השרת:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>message</td>
+<td>string</td>
+<td>הודעת הצלחה</td>
+<td>VerifiedOK</td>
+</tr>
+</tbody>
+</table></div>
+<p>אחרי ביצוע אימות לטוקן ניתן להשתמש איתו למתודות שיבוארו מייד לאחר הסבר השגיאות.</p>
+<p><span>שגיאות אפשרויות:</span><br />
+סוג השגיאה מופיע ב <code>responseStatus</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>סוג שגיאה</th>
+<th>ערך הסברה</th>
+<th>תוכן</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>ERROR</td>
+<td>message</td>
+<td>Please SendCode before</td>
+<td>לא ניתן לבצע אימות לפני שליחת שיחה. יש לשלוח שיחה קודם.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ERROR</td>
+<td>message</td>
+<td>Authentication failed</td>
+<td>הקוד לא תקין.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ERROR</td>
+<td>message</td>
+<td>Missing parameters</td>
+<td>חסרים פרמטרים, או ש <code>action</code> ריק או שהוא מצפה לערך נוסף</td>
+</tr>
+<tr>
+<td>4</td>
+<td>ERROR</td>
+<td>message</td>
+<td>Token has already been verified</td>
+<td>כבר בוצע אימות דו שלבי בטוקן זה.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>מתודה -</strong> <code>GetLoginLog</code><br />
+קבל לוג התחברויות</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן <strong>שעבר אימות דו שלבי</strong></td>
+</tr>
+<tr>
+<td>limit</td>
+<td>ניתן להגביל את כמות התוצאות שיתקבלו</td>
+</tr>
+<tr>
+<td>username</td>
+<td>חיפוש לוג לפי שם משתמש</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>לגבי ערך username:</strong> בעצם LoginLog לא מחייב שמדובר במערכת אמיתית ולכן זה נשמר לפי שם משתמש, בעת פניה ללא הערך יחזרו הלוגים של המספר הראשי של המערכת, אם ברצונכם להביא לוגים של מספר משנה למשל, יש לצרף ערך זה עם המספר משנה.</p>
+<p>בתגובת השרת במידה שהטוקן תקין יתקבל array בשם <code>data</code> המכיל את כל התוצאות, כל תוצאה היא גם מערך המכיל את השדות הבאים:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>remoteIP</td>
+<td>string</td>
+<td>כתובת IP</td>
+<td>172.18.0.1</td>
+</tr>
+<tr>
+<td>sessionType</td>
+<td>string</td>
+<td>סוג החיבור</td>
+<td>REGULAR</td>
+</tr>
+<tr>
+<td>actionTimestamp</td>
+<td>string</td>
+<td>זמן</td>
+<td>2021-07-30 14:13:00</td>
+</tr>
+<tr>
+<td>username</td>
+<td>string</td>
+<td>שם המשתמש</td>
+<td>0773137770</td>
+</tr>
+<tr>
+<td>successful</td>
+<td>boolean</td>
+<td>האם מדובר בחיבור מוצלח או לא</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><span>שגיאות אפשרויות:</span><br />
+סוג השגיאה מופיע ב <code>responseStatus</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>סוג שגיאה</th>
+<th>ערך הסברה</th>
+<th>תוכן</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>Unverified session</td>
+<td>טוקן לא עבר אימות דו שלבי.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>Unknown username</td>
+<td>ערך שם משתמש שגוי.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>מתודה -</strong> <code>GetAllSessions</code><br />
+קבל סשנים פעילים</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן <strong>שעבר אימות דו שלבי</strong></td>
+</tr>
+<tr>
+<td>limit</td>
+<td>ניתן להגביל את כמות התוצאות שיתקבלו</td>
+</tr>
+</tbody>
+</table></div>
+<p>בתגובת השרת במידה שהטוקן תקין יתקבל array בשם <code>sessions</code> המכיל את כל החיבורים וערך int בשם sessionsCount המכיל את כמות הסשנים הפעילים.<br />
+כל ערך בתוך <code>sessions</code> יכיל:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>מזהה טוקן, לצורך הריגה שלו</td>
+<td>16598</td>
+</tr>
+<tr>
+<td>token</td>
+<td>string</td>
+<td>רמז של הטוקן</td>
+<td><code>hwe***5J76TM</code></td>
+</tr>
+<tr>
+<td>active</td>
+<td>boolean</td>
+<td>האם הטוקן פעיל</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td>selectedDID</td>
+<td>string</td>
+<td>שם משתמש (בחיבור של API זה <code>null</code></td>
+<td>0773137770</td>
+</tr>
+<tr>
+<td>remoteIP</td>
+<td>string</td>
+<td>כתובת IP של יוצר הטוקן</td>
+<td>172.18.0.1</td>
+</tr>
+<tr>
+<td>sessionType</td>
+<td>string</td>
+<td>סוג החיבור</td>
+<td>API</td>
+</tr>
+<tr>
+<td>createTime</td>
+<td>string</td>
+<td>זמן יצירה</td>
+<td>2021-07-30 14:38:30</td>
+</tr>
+<tr>
+<td>lastRequest</td>
+<td>string</td>
+<td>שימוש אחרון</td>
+<td>2021-07-30 14:42:31</td>
+</tr>
+<tr>
+<td>doubleAuthStatus</td>
+<td>boolean</td>
+<td>האם החיבור עבר אימות דו-שלבי</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>mfaStatus</td>
+<td>boolean</td>
+<td>סטטוס מעבר אימות דו שלבי גלובלי</td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td>mfaRealValid</td>
+<td>boolean</td>
+<td>האם עבר אימות דו שלבי גלובלי  באותו הסשן</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>mfaRequestId</td>
+<td>int</td>
+<td>מזהה בקשת אימות דו שלבי גלובלי של אותו החיבור</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>mfaValidReason</td>
+<td>string</td>
+<td>סיבת מעבר אימות דו-שלבי גלובלי</td>
+<td><code>MFA_PASSED </code></td>
+</tr>
+</tbody>
+</table></div>
+<p><span>שגיאות אפשרויות:</span><br />
+סוג השגיאה מופיע ב <code>responseStatus</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>סוג שגיאה</th>
+<th>ערך הסברה</th>
+<th>תוכן</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>Unverified session</td>
+<td>טוקן לא עבר אימות דו שלבי.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>מתודה -</strong> <code>KillSession</code><br />
+סגירת סשן</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן <strong>שעבר אימות דו שלבי</strong></td>
+</tr>
+<tr>
+<td>SessionId</td>
+<td>מזהה סשן להריגה</td>
+</tr>
+</tbody>
+</table></div>
+<p>תגובה תקינה של השרת:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>SessionId</td>
+<td>string</td>
+<td>מזהה הסשן שנסגר</td>
+<td>35</td>
+</tr>
+</tbody>
+</table></div>
+<p><span>שגיאות אפשרויות:</span><br />
+סוג השגיאה מופיע ב <code>responseStatus</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>סוג שגיאה</th>
+<th>ערך הסברה</th>
+<th>תוכן</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>Unverified session</td>
+<td>טוקן לא עבר אימות דו שלבי.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>SessionId Can only be a number</td>
+<td>ערך מזהה סשן ריק או לא תקין.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ERROR</td>
+<td>message</td>
+<td>SSessionId is broken</td>
+<td>מזהה סשן לא פעיל או לא נמצא.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>מתודה -</strong> <code>KillAllSessions</code><br />
+סגירת כל הסשנים הפעילים של המערכת</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן <strong>שעבר אימות דו שלבי</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>תגובה תקינה של השרת:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>KillSessions</td>
+<td>string</td>
+<td>כמות הסשנים שנסגרו</td>
+<td>10</td>
+</tr>
+</tbody>
+</table></div>
+<p><span>שגיאות אפשרויות:</span><br />
+סוג השגיאה מופיע ב <code>responseStatus</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>סוג שגיאה</th>
+<th>ערך הסברה</th>
+<th>תוכן</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>EXCEPTION</td>
+<td>message</td>
+<td>Unverified session</td>
+<td>טוקן לא עבר אימות דו שלבי.</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="run-tzintuk" data-search="הפעלת צינתוק RunTzintuk הודעות ותקשורת">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">הודעות ותקשורת</p>
+        <h2>הפעלת צינתוק</h2>
+      </div>
+      <code class="command-name">RunTzintuk</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> שולח צינתוק למספרים, לרשימות תפוצה או לרשימות צינתוקים חינמיים.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/RunTzintuk</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>RunTzintuk</code></p>
+<p>שליחת צינתוק במתודה זו היא בעלות של 0.1 יחידה למספר <strong>מלבד הפעלה של צינתוק מרשימת צינתוקים חינמים שהיא ללא עלות</strong>.<br />
+יתכן שתעריף השימוש במודול זה ישתנה בהמשך לפי שיקול דעת ההנהלה.</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>callerId</td>
+<td>זיהוי יוצא, בחירת מחדל זיהוי ראשי של המערכת, ניתן לכתוב זיהוי ספיישל או מספר משנה. ניתן להשתמש עם זיהוי רנדומלי על ידי ציון <code>RAND</code>, זיהוי רנדומלי יבואר מתחת לטבלא</td>
+<td>int</td>
+</tr>
+<tr>
+<td>TzintukTimeOut</td>
+<td>זמן צינתוק. בחירת מחדל 9 שניות. מקסימום זמן צינתוק 16 שניות</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>phones</td>
+<td>מספרים לחיוג.  יבוארו האפשרויות למטה.</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>הסבר על זיהוי רנדומלי:</strong><br />
+השירות מיועד למשל כדי לבצע אימות מספר טלפון באתרים וכד, בעת ציון של ערך זה לא ניתן לשלוח לרשימה של מספרים והמספר הראשון ברשימה כפי שנבחרה יקבל את השיחה.<br />
+בתגובה מהשרת יתמלא גם ערך <code>verifyCode</code> שמכיל את 4 הספרות האחרונות של הזיהוי ממנו יצא השיחה, ובערך <code>callerId</code> בתגובה מהשרת יהיה כתוב <code>RAND</code>. תוכלו לבצע אימות של הלקוח בצורה שאתם מבקשים ממנו להקיש את ה4 ספרות האחרונות של המספר ממנו הוא  קיבל את השיחה ואתם משווים את זה עם <code>verifyCode</code>.<br />
+במקרה שהשיחה לא מזיהוי רנדומלי ערך <code>verifyCode</code> יהיה ריק.</p>
+<p><strong>צורות אפשרויות להגשת רשימת המספרים לחיוג:</strong><br />
+כאשר הפניה היא בGET או בPOST שהוא לא jsos (<code>Content-Type: application/json)</code> יש 3  אפשריות:</p>
+<ul>
+<li>רשימה מפורשת עם הפרדה של <code>:</code> בין מספר למספר</li>
+<li>מספרים מתוך רשימת תפוצה קיימת על ידי ציון <code>tpl:XX</code> כשאשר במקום ה<code>XX</code> יש לכתוב את מזהה רשימת התפוצה.</li>
+<li>צינתוק לרשימת צינתוק חינמי (שימו לב הערה למטה בנוגע לאפשרויות שליחה לכמה רשימות צינתוקים חינמיים) על ידי ציון <code>tzl:XX</code> כאשר במקום <code>XX</code> יש לכתוב את מספר הרשימה במערכת.<br />
+כאשר הפניה היא json - ניתן גם לשלוח את רשימת המספרים כמערך:</li>
+</ul>
+<pre><code>{
+    "phones": [
+        "0510000",
+        "0510001",
+        "0510002",
+        "0510003"
+    ]
+}
+</code></pre>
+<p>או כמערך עם אובייקטים לצורך ציון זיהוי יוצא ספציפי לכל מספר:</p>
+<pre><code>{
+    "phones": [
+        {
+            "phone": "0511111",
+            "callerId": "077313"
+        },
+        {
+            "phone": "05111333",
+            "callerId": "07731344"
+        }
+    ]
+}
+</code></pre>
+<p>או על אותו הדרך עם קבוצות:</p>
+<pre><code>"phones": [
+        {
+            "phones": [
+                "0511111",
+                "051111221"
+            ],
+            "callerId": "077313"
+        },
+        {
+            "phones": [
+                "0511111999"
+            ],
+            "callerId": "077414"
+        }
+    ]
+</code></pre>
+<p>ואז ניתן להוציא צינתוק לרשימת מספרים עם ״זיהוי שיחה מתחלף״.</p>
+<hr />
+<p><strong>שליחת צינתוקים לכמה רשימות צינתוקים חינמיים יחד:</strong></p>
+<h4>השירות מוגבל ל50 רשימות בקריאה.</h4>
+<p>בעת שליחת צינתוק לרשימת צינתוקים חינמיים ניתן להפעיל קמפיין אחד לכמה רשימות יחד.<br />
+<strong>מספרים הנמצאים בכמה מהרשימות יקבלו צינתוק אחד בלבד.</strong><br />
+על מנת לציין כמה רשימות ניתן או לחלק את הרשימות על ידי <code>,</code> אחרי ציון <code>tzl:</code>. למשל, כדי לשלוח לרשימה <code>100</code> ולרשימה <code>200</code> ו <code>300</code> יש לציין: <code>tzl:100,200,300</code>.<br />
+במידה ששמות הרשימות מכילות את התו <code>,</code> זה ייצור בעיות, ולכן אפשר גם לציין את זה כמערך, זאת במידה שהשליחה היא בPOST - json באופן שב<code>phones</code> מציינים רק  <code>tzl:</code> ואת הרשימות בפרמטר <code>tzintukLists</code>. כמו בדוגמא הבאה:</p>
+<pre><code>{
+    "phones": "tzl:",
+    "tzintukLists": [
+        "100",
+        "200",
+        "בית ספר, כיתה ג",
+        "משרד, מזכירות"
+    ]
+}
+</code></pre>
+<p><strong>מאפייני תגובת השרת בתגובה מוצלחת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>sting</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>verifyCode</td>
+<td>sting</td>
+<td>4 ספרות אחרונות של הזיהוי היוצא לצורכי אימות. יהיה מלא רק במידה שהשיחה מזיהוי רנדומלי.</td>
+<td><code>9835</code></td>
+</tr>
+<tr>
+<td>callerId</td>
+<td>sting</td>
+<td>זיהוי השיחה היוצא</td>
+<td><code>0773137770</code></td>
+</tr>
+<tr>
+<td>callsCount</td>
+<td>int</td>
+<td>כמות שיחות יוצאות</td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td>bilingPerCall</td>
+<td>int</td>
+<td>תשלום לכל שיחה</td>
+<td><code>0.1</code></td>
+</tr>
+<tr>
+<td>biling</td>
+<td>int</td>
+<td>כמות תשלום כולל</td>
+<td><code>0.3</code></td>
+</tr>
+<tr>
+<td>errors</td>
+<td>array</td>
+<td>מערך של מספרי טלפון שלא נשלח אילהם השיחה כולל הסיבה.</td>
+<td>מתחת לטבלא</td>
+</tr>
+</tbody>
+</table></div>
+<p>דוגמא לפירוט שגיאות במערך "errors":</p>
+<pre><code>{
+05832XXXXX: "blocked", // חסום
+0773137770: "double", // מספר כפול
+*8080: "notValid" // מספר לא תקין
+}
+</code></pre>
+    </div>
+  </section>
+
+  <section class="api-section" id="tzintuk-lists" data-search="ניהול רשימות צינתוקים TzintukimListManagement הודעות ותקשורת">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">הודעות ותקשורת</p>
+        <h2>ניהול רשימות צינתוקים</h2>
+      </div>
+      <code class="command-name">TzintukimListManagement</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מציג, יוצר, מאפס ומנהל מנויים ברשימות הצינתוקים החינמיים.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/TzintukimListManagement</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>TzintukimListManagement</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>action</td>
+<td>פעולה לביצוע, ערך חובה. יוסברו הפעולות מטה</td>
+<td>string</td>
+</tr>
+<tr>
+<td>TzintukimList</td>
+<td>מספר הרשימה. לא חובה כאשר מבקשים לקבל את רשימת הצינתוקים</td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>פעולה:</strong> getlists</p>
+<p>מחזיר את כל רשימות הצינתוקים בתוך מערך "lists"</p>
+<p><strong>מאפייני תגובת השרת בתגובה מוצלחת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>lists</td>
+<td>array</td>
+<td>מערך של הרשימות, ראה טבלא למטה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>כל אובייקט במערך <code>lists</code> מכיל 2 ערכים:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>listName</td>
+<td>string</td>
+<td>שם הרשימה</td>
+<td>120</td>
+</tr>
+<tr>
+<td>subscribers</td>
+<td>int</td>
+<td>כמות רשומים</td>
+<td>7</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>פעולה:</strong> getlistEnteres.<br />
+<strong>חובה לצרף ערך TzintukimList</strong></p>
+<p>מחזיר את רשימת המספרים המנויים  לרשימה</p>
+<p><strong>מאפייני תגובת השרת בתגובה מוצלחת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>listName</td>
+<td>string</td>
+<td>שם הרשימה</td>
+<td>1844</td>
+</tr>
+<tr>
+<td>countSubscribers</td>
+<td>int</td>
+<td>כמות הרשומים</td>
+<td>7</td>
+</tr>
+<tr>
+<td>enteres</td>
+<td>array</td>
+<td>מערך של המספרים ושמות שלהם.</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><i data-bs-toggle="tooltip" data-bs-placement="top"></i> השמות נטענים מקובץ 'PhonesName.ini' מהשלוחה הראשית, תבנית הקובץ צריכה להכיל "טלפון=שם"</p>
+<p>כל אובייקט במערך <code>enteres</code> מכיל:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>phone</td>
+<td>string</td>
+<td>מספר הטלפון הרשום</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>השם של מספר הטלפון הרשום כפי שנטען מקובץ PhonesName.ini</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>פעולה:</strong> getLogList<br />
+<strong>חובה לצרף ערך TzintukimList</strong></p>
+<p>מחזיר את לוג הפעולות שבוצעו על הרשימה</p>
+<p><strong>מאפייני תגובת השרת בתגובה מוצלחת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>events</td>
+<td>array</td>
+<td>מערך של האירועים, ראה טבלה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>כל אובייקט במערך <code>events</code> מכיל:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Folder</td>
+<td>string</td>
+<td>שלוחה במערכת</td>
+<td>1/2</td>
+</tr>
+<tr>
+<td>CustomerDID</td>
+<td>string</td>
+<td>מספר המערכת</td>
+<td>0773137770</td>
+</tr>
+<tr>
+<td>Phone</td>
+<td>string</td>
+<td>מבצע הפעולה</td>
+<td>0533137770</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>string</td>
+<td>תאריך</td>
+<td>19/01/2021</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>string</td>
+<td>שעת ביצוע</td>
+<td>00:39:10</td>
+</tr>
+<tr>
+<td>TypeOperation</td>
+<td>string</td>
+<td>סוג הפעולה</td>
+<td>מצורף למטה הסוגים</td>
+</tr>
+<tr>
+<td>PhoneAction</td>
+<td>string</td>
+<td>פעולה על טלפון</td>
+<td>(הערך יהיה מלא במידה שמדובר בפעולה על טלפון מסויים ברשימה)</td>
+</tr>
+</tbody>
+</table></div>
+<p>הסוגים האפשריים בTypeOperation:</p>
+<pre><code>AddToListTzintuk // הוספה לרשימה
+RunTzintuk // הפעלת צינתוק
+RemovingToListTzintuk // הסרה מהרשימה
+AdminRemovingToListTzintuk // מנהל הסיר מספר מהרשימה
+ResetToListTzintuk // הרשימה אופסה
+</code></pre>
+<hr />
+<p><strong>פעולה:</strong> resetList<br />
+<strong>חובה לצרף ערך TzintukimList</strong></p>
+<p>מאפס רשימת צינתוקים</p>
+<p><strong>מאפייני תגובת השרת בתגובה מוצלחת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>list</td>
+<td>string</td>
+<td>הרשימה שאופסה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>באם תיהיה שגיאה יחזיר שגיאה</p>
+    </div>
+  </section>
+
+  <section class="api-section" id="send-fax" data-search="שליחת פקס SendFax הודעות ותקשורת">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">הודעות ותקשורת</p>
+        <h2>שליחת פקס</h2>
+      </div>
+      <code class="command-name">SendFax</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> שולח קובץ PDF כמסמך פקס ומאפשר לקבל עדכון על תוצאת המסירה.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/SendFax</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>SendFax</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>pdfFile</td>
+<td>קובץ לשליחה. יבואר 2 אפשרויות</td>
+<td>string</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>לאן לשלוח</td>
+<td>string</td>
+</tr>
+<tr>
+<td>callerId</td>
+<td>זיהוי שיחה יוצאת. בחירת מחדל הזיהוי של המערכת הראשי</td>
+<td>string</td>
+</tr>
+<tr>
+<td>deliveryUrl</td>
+<td>כתובת לקבלת דוח מסירה</td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><code>pdfFile</code><br />
+ניתן לציין נתיב של קובץ מתוך המערכת, למשל: <code>ivr2://FaxTest.pdf</code> וישלח את קובץ "FaxTest.pdf" שתחת השלוחה הראשית. אפשר גם לציין את זה: <code>/FaxTest.pdf</code>, רק חשוב ה<code>/</code> בהתחלה.</p>
+<p><strong>בנוסף, ניתן להעלות קובץ ספציפי, לצורך כך יש לציין בערך <code>UPLOAD</code></strong><br />
+ואז יש להעלות את הקובץ בערך "<code>fileToUpload</code>, כמובן בעת שימוש באפשרות זו הפניה חייבת להיות בPOST מסוג <code>multipart/form-data</code></p>
+<hr />
+<p><code>deliveryUrl</code> יש לציין URL מלא לקבלת דוח מסירה. למשל: <code>http://127.0.0.6:18358/FaxDel</code>, הפניות ישלחו בPOST בלבד ויכילו את הערכים הבאים:</p>
+<p>לכל הפניות יצורף ערך <code>CampaignId</code> שתוכלו להשוות אותו עם ערך <code>CampaignId</code> שמתקבל בהצלחה.<br />
+לכל הפניות יצורף ערך <code>Delivery</code> המכיל את סטטוס המסירה.</p>
+<ul>
+<li>במידה ש<code>Delivery</code> הוא <code>NoAnswer</code> יצורף ערך <code>DIALSTATUS</code> המכיל את התשובה של החיוג ללקוח.</li>
+<li>במידה ש<code>Delivery</code> הוא <code>End</code> יצורף ערך <code>status</code> המכיל את התשובה מצד מנוע הפקס. תשובה של מסירה מוצלחת תיהיה <code>SUCCESS</code> בערך <code>status</code>.</li>
+<li>במידה ש<code>Delivery</code> הוא <code>Answer</code> זה אומר שהשיחה נענת, מציין שהעברת הפקס התחילה.</li>
+</ul>
+<hr />
+<p><strong>על כל שליחה של פקס יש חיוב של 0.1 יחידות על עצם השליחה ובנוסף חיוב יחסי לפי הזמן של השיחה הפעילה - בחישוב של יחידה לדקה. אם זמן השליחה לקח 3 דקות תחוייבו בנוסף 3 יחידות, בנוסף, לא ניתן להפעיל שיחת פקס אם אין ספייר במערכת של יותר מ5 יחידות מהחיוב על השיחה עצמה.</strong></p>
+<p>מענה בעת הצלחה:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>callerId</td>
+<td>string</td>
+<td>זיהוי השיחה היוצאת</td>
+<td>0773137770</td>
+</tr>
+<tr>
+<td>CampaignId</td>
+<td>string</td>
+<td>מזהה הקמפיין</td>
+<td>WSOC-LC-2021-08-28-21-40-49-083</td>
+</tr>
+<tr>
+<td>deliveryUrl</td>
+<td>string</td>
+<td>מציין את הכתובת למסירה באם צויינה</td>
+<td><a href="http://127.0.0.6:18358/FaxDel" rel="nofollow ugc">http://127.0.0.6:18358/FaxDel</a></td>
+</tr>
+<tr>
+<td>fileNameSend</td>
+<td>string</td>
+<td>שם הקובץ שנשלח</td>
+<td>ivr2://FaxTest.pdf</td>
+</tr>
+<tr>
+<td>callsCount</td>
+<td>int</td>
+<td>כמות שיחות יוצאות</td>
+<td>1</td>
+</tr>
+<tr>
+<td>bilingPerCall</td>
+<td>float</td>
+<td>חיוב לכל שיחה</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td>biling</td>
+<td>float</td>
+<td>כמות חיוב בפועל</td>
+<td>0.1</td>
+</tr>
+</tbody>
+</table></div>
+<p>בעת שגיאה תפורט השגיאה והבעיה.</p>
+    </div>
+  </section>
+
+  <section class="api-section" id="check-file" data-search="בדיקה אם קובץ קיים CheckIfFileExists קבצים ושלוחות">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">קבצים ושלוחות</p>
+        <h2>בדיקה אם קובץ קיים</h2>
+      </div>
+      <code class="command-name">CheckIfFileExists</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> בודק אם קובץ מסוים קיים במערכת לפי הנתיב שלו.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/CheckIfFileExists</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>CheckIfFileExists</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>path</td>
+<td>נתיב במערכת. דוגמאות למטה</td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>אפשרויות ציון קבצים ניתן לציין בכל אחד מהצורות מטה:<br />
+לצורך הדוגמא כדי לחפש את קובץ <code>ext.ini</code> בשלוחה 4.</p>
+<pre><code>path=ivr2:/4/ext.ini
+
+path=ivr2:4/ext.ini
+
+path=ivr/4/ext.ini
+</code></pre>
+<hr />
+<p>מענה בעת הצלחה:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>fileExists</td>
+<td>bool</td>
+<td>האם הקובץ קיים</td>
+<td></td>
+</tr>
+<tr>
+<td>path</td>
+<td>string</td>
+<td>המיקום שלו</td>
+<td>ivr/1/ext.ini</td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="send-sms" data-search="שליחת SMS SendSms הודעות ותקשורת">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">הודעות ותקשורת</p>
+        <h2>שליחת SMS</h2>
+      </div>
+      <code class="command-name">SendSms</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> שולח הודעת SMS עם זיהוי מספרי או טקסטואלי בהתאם להרשאות המערכת.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/SendSms</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>SendSms</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>from</td>
+<td>זיהוי שולח, <strong>בחירת מחדל זיהוי המערכת הראשי.</strong> ניתן לכתוב מספר מאושר במערכת או מספר משני. ניתן גם לבצע שליחה משולח טקסטואלי (זיהוי טקסט), באם יש לכם צורך בזה יש לפנות לשירות הלקוחות עם סיבה.</td>
+<td>string</td>
+</tr>
+<tr>
+<td>message</td>
+<td>תוכן ההודעה</td>
+<td>string</td>
+</tr>
+<tr>
+<td>sendFlashMessage</td>
+<td>הודעת פלאש? מסרון פלאש (הודעת הבזק) ישלח ללקוח ויקפוץ בטלפון במסך מלא. האפשרות יכולה לא לעבוד בטלפונים מסויימים/במפעילים מסויימים ויתכן שנמענים מסויימים יזהו את המסרון כמסרון רגיל.</td>
+<td>Boolean (0/1)</td>
+</tr>
+<tr>
+<td>phones</td>
+<td>נמענים בהפרדה של <code>:</code> בין כל מספר, <strong>או</strong> <code>tpl:X</code> על מנת לשלוח לרשימת תפוצה במערכת שבמקום הX יש לכתוב את <strong>מזהה הקמפיין</strong></td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>החיוב על שליחת סמס הוא 0.1 יחידה לכל 70 תוים בחיוב לכל מספר טלפון.</strong></p>
+<p>מענה בעת הצלחה:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>message</td>
+<td>string</td>
+<td>תוכן ההודעה ששלחתם</td>
+<td></td>
+</tr>
+<tr>
+<td>from</td>
+<td>string</td>
+<td>הזיהוי ממנו יצאה ההודעה</td>
+<td></td>
+</tr>
+<tr>
+<td>sendCount</td>
+<td>int</td>
+<td>כמה הודעות נשלחו</td>
+<td></td>
+</tr>
+<tr>
+<td>Billing</td>
+<td>float</td>
+<td>תשלום</td>
+<td></td>
+</tr>
+<tr>
+<td>oks</td>
+<td>array</td>
+<td>מערך של מספרים אילהם נשלחה ההודעה</td>
+<td></td>
+</tr>
+<tr>
+<td>errors</td>
+<td>object</td>
+<td>אובייקט המכיל את המספרים שאילהם לא נשלחה ההודעה כולל הסיבה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>במקרה של שגיאה השגיאה תפורט.</p>
+    </div>
+  </section>
+
+  <section class="api-section" id="bridge-call" data-search="הקמת שיחת גישור CreateBridgeCall שיחות וחדרי ועידה">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">שיחות וחדרי ועידה</p>
+        <h2>הקמת שיחת גישור</h2>
+      </div>
+      <code class="command-name">CreateBridgeCall</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מחייג לשני צדדים ומחבר ביניהם בשיחת גישור.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/CreateBridgeCall</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>CreateBridgeCall</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>callerId</td>
+<td>זיהוי השיחה היוצאת שתופיע על הצג לאורך הדרך</td>
+<td>string</td>
+</tr>
+<tr>
+<td>Phones</td>
+<td>מספר טלפון לחיוג</td>
+<td>string</td>
+</tr>
+<tr>
+<td>BridgePhones</td>
+<td>מספר טלפון לניתוב</td>
+<td>string</td>
+</tr>
+<tr>
+<td>DialSip</td>
+<td>האם להפעיל מנגנון חיוג ל SIP (הסבר למטה)</td>
+<td>0/1</td>
+</tr>
+<tr>
+<td>DialSipExtension</td>
+<td>האם להפעיל מנגנון חיוג ל<strong>שלוחת</strong> SIP (הסבר למטה)</td>
+<td>0/1</td>
+</tr>
+<tr>
+<td>AccountNumber</td>
+<td>מספר חשבון SIP במערכת (בחירת מחדל המספר הראשי)</td>
+<td>int</td>
+</tr>
+<tr>
+<td>SipExtension</td>
+<td>במידה שזה שלוחת sip, יש לציין את השלוחה.</td>
+<td>int</td>
+</tr>
+<tr>
+<td>RecordCall</td>
+<td>האם להקליט את השיחה</td>
+<td>Boolean (0/1)</td>
+</tr>
+<tr>
+<td>SendMailInCall</td>
+<td>האם לשלוח הקלטה למייל</td>
+<td>Boolean (0/1)</td>
+</tr>
+<tr>
+<td>SendMailInCallTo</td>
+<td>מייל ספציפי לשליחת ההקלטה. בחירת מחדל המייל המופיע במערכת</td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>ערכים שיש להם בחירת מחדל:</strong></p>
+<pre><code>callerId=מספר מערכת ראשי
+RecordCall=0
+SendMailInCall=0
+</code></pre>
+<p>הסבר אודות הפעלת שירות חיוג לחשבון SIP (<code>DialSip)</code>:<br />
+השירות מאפשר לחייג לחשבון SIP קיים במערכת וממנו לגשר את השיחה באופן שלא יהיה עלות ניתוב כפול אלא רק עלות של הניתוב החיצוני - אחרי המענה בשלוחת SIP.<br />
+בעת הפעלת השירות ערך <code>Phones</code> לא משנה (עדיין חובה לשלוח אותו) והמספר שיקבע הוא המספר של חשבון הSIP/השלוחה של חשבון ה sip לפי הפרמטרים.<br />
+<strong>לא ניתן לחייג לשלוחת SIP שלא קיימת באותה המערכת.</strong><br />
+<strong>בכל מקרה יש עלות של 0.1 יחידות על עצם הפעלת הקמפיין</strong></p>
+<h3><strong>החיוב על שליחת שיחה הוא 0.1 יחידה על עצם הקמת שיחת הגישור ואז לפי החישוב הבא:</strong></h3>
+<p>יש כאן 2 מסלולי חיוב.<br />
+1: מהרגע שאני מוציא שיחה לנציג.<br />
+2: מהרגע שהלקוח המגושר ענה.</p>
+<p>למשל, אם אני חייגתי לנציג 60 שניות, הוא חייג ללקוח - שהוא הלקוח המגושר. זמן החיוג היה 10 שניות ועוד 50 שניות הוא דיבר איתו, אז החיוב יחידות יהיה על 110 שניות:<br />
+60 שזה זמן השיחה הכללי, + 50 שניות של דיבור עם הלקוח המגושר. על זמן החיוג ללקוח המגושר הוא לא משלם.</p>
+<p>מענה בעת הצלחה:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>CampaignId</td>
+<td>string</td>
+<td>מזהה קמפיין</td>
+<td>WSOC-LC-2021-11-23-15-10-15-276</td>
+</tr>
+<tr>
+<td>callerId</td>
+<td>string</td>
+<td>זיהוי השיחה</td>
+<td></td>
+</tr>
+<tr>
+<td>callsCount</td>
+<td>int</td>
+<td>כמות שיחות</td>
+<td>1</td>
+</tr>
+<tr>
+<td>bilingPerCall</td>
+<td>float</td>
+<td>עלות של כל שיחה</td>
+<td></td>
+</tr>
+<tr>
+<td>biling</td>
+<td>string</td>
+<td>סך הכל חיוב</td>
+<td></td>
+</tr>
+<tr>
+<td>SendMailInCall</td>
+<td>Boolean</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>RecordCall</td>
+<td>Boolean</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SendMailInCallTo</td>
+<td>string</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>כמובן, הערכים הקשורים לחיוב שמתקבלים בתגובה מציינים את החיוג על הפעלה הקמפיין ולא על החיוב הסופי שמחושב בנפרד.</p>
+<p>במקרה של שגיאה השגיאה תפורט.</p>
+    </div>
+  </section>
+
+  <section class="api-section" id="queue-realtime" data-search="מידע בזמן אמת על תור GetQueueRealTime שיחות וחדרי ועידה">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">שיחות וחדרי ועידה</p>
+        <h2>מידע בזמן אמת על תור</h2>
+      </div>
+      <code class="command-name">GetQueueRealTime</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר את מצב שלוחת התור והנציגים בזמן אמת.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/GetQueueRealTime</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא -</strong> <code>GetQueueRealTime</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>queuePath</td>
+<td>נתיב שלוחת התור במערכת. לשלוחה ראשית: <code>.</code> או לשלוחות פניומיות: <code>/1/2</code></td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<p>מענה בעת הצלחה:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>queueData</td>
+<td>Object</td>
+<td>מידע כללי על התור</td>
+<td>דוגמא בטבלא למטה</td>
+</tr>
+<tr>
+<td>members</td>
+<td>array</td>
+<td>מידע על הנציגים</td>
+<td>דוגמא בטבלא למטה</td>
+</tr>
+<tr>
+<td>entries</td>
+<td>array</td>
+<td>מידע על הממתינים</td>
+<td>דוגמא בטבלא למטה</td>
+</tr>
+</tbody>
+</table></div>
+<h3>שימו לב! כל הסטטיסטיקות של <strong>הנציגים</strong> בזמן אמת מתאפסת בעת שינוי קובץ <code>queue.ini</code> שבשלוחה.</h3>
+<hr />
+<p>פירוט של "<strong>queueData</strong>":</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>ערך</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abandoned</td>
+<td>int</td>
+<td>שיחות שננטשו</td>
+</tr>
+<tr>
+<td>Calls</td>
+<td>int</td>
+<td>לקוחות ממתינים</td>
+</tr>
+<tr>
+<td>Completed</td>
+<td>int</td>
+<td>שיחות שהושלמו</td>
+</tr>
+<tr>
+<td>TalkTime</td>
+<td>int</td>
+<td>זמן שיחות</td>
+</tr>
+<tr>
+<td>Holdtime</td>
+<td>int</td>
+<td>זמן המתנה</td>
+</tr>
+<tr>
+<td>Max</td>
+<td>int</td>
+<td>מקסימום שיחות בתור</td>
+</tr>
+<tr>
+<td>Strategy</td>
+<td>string</td>
+<td>סוג התור</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>פירוט של כל אובייקט במערך  "<strong>members</strong>":</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>ערך</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>agent</td>
+<td>string</td>
+<td>מספר הנציג</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>string</td>
+<td>סטטוס נציג. 1 פנוי 2 תפוס</td>
+</tr>
+<tr>
+<td>CallsTaken</td>
+<td>int</td>
+<td>שיחות שהנציג לקח</td>
+</tr>
+<tr>
+<td>LastCallUnitTime</td>
+<td>string</td>
+<td>זמן השיחה האחרונה שהוא לקח ב unit time</td>
+</tr>
+<tr>
+<td>LastCall</td>
+<td>string</td>
+<td>זמן של השיחה האחרונה שלקח</td>
+</tr>
+<tr>
+<td>LastCallAgo</td>
+<td>string</td>
+<td>לפני כמה זמן לקח שיחה אחרונה, למשל: <code>4 דקות, 33 שניות</code></td>
+</tr>
+<tr>
+<td>Paused</td>
+<td>Boolean</td>
+<td>האם הנציג בהפסקה</td>
+</tr>
+<tr>
+<td>Penalty</td>
+<td>string</td>
+<td>עדיפות הנציג בתור</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>פירוט של כל אובייקט במערך  "<strong>entries</strong>":</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>ערך</th>
+<th>סוג</th>
+<th>הסבר</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>phone</td>
+<td>string</td>
+<td>מספר הלקוח</td>
+</tr>
+<tr>
+<td>Wait</td>
+<td>string</td>
+<td>זמן המתנה בשניות</td>
+</tr>
+<tr>
+<td>WaitAgo</td>
+<td>string</td>
+<td>כמה זמן הלקוח ממתין, למשל: <code>7 דקות, 23 שניות</code></td>
+</tr>
+<tr>
+<td>Position</td>
+<td>string</td>
+<td>מיקום בתור</td>
+</tr>
+<tr>
+<td>CallId</td>
+<td>string</td>
+<td>מזהה שיחת תור לצורך ביצוע פעולות</td>
+</tr>
+</tbody>
+</table></div>
+<p>במקרה של שגיאה השגיאה תפורט.</p>
+    </div>
+  </section>
+
+  <section class="api-section" id="customer-data" data-search="מידע על המערכת GetCustomerData דוחות ומידע">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">דוחות ומידע</p>
+        <h2>מידע על המערכת</h2>
+      </div>
+      <code class="command-name">GetCustomerData</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר את המספר הראשי, מספרים משניים, זיהויים ומידע כללי על המערכת.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/GetCustomerData</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא</strong> - <code>GetCustomerData</code></p>
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור / הערות</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>מאפייני תגובת השרת:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>ערך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mainDid</td>
+<td>string</td>
+<td>מספר המערכת הראשי</td>
+</tr>
+<tr>
+<td>secondary_dids</td>
+<td>array</td>
+<td>מערך של מספרים משניים (ראה להלן)</td>
+</tr>
+<tr>
+<td>callerIds</td>
+<td>array</td>
+<td>מערך של מספרי ספיישל לשיחות יוצאות (ראה להלן)</td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>שם לקוח</td>
+</tr>
+<tr>
+<td>expiredUnits</td>
+<td>boolean</td>
+<td>האם יחידות פגו תוקף</td>
+</tr>
+<tr>
+<td>unitsExpireDate</td>
+<td>string</td>
+<td>תאריך תפוגה של היחידות</td>
+</tr>
+<tr>
+<td>email</td>
+<td>string</td>
+<td>כתובת אימייל</td>
+</tr>
+<tr>
+<td>organization</td>
+<td>string</td>
+<td>שם ארגון</td>
+</tr>
+<tr>
+<td>contactName</td>
+<td>string</td>
+<td>שם איש קשר</td>
+</tr>
+<tr>
+<td>phones</td>
+<td>string</td>
+<td>טלפון</td>
+</tr>
+<tr>
+<td>invoiceName</td>
+<td>string</td>
+<td>חשבונית על שם</td>
+</tr>
+<tr>
+<td>invoiceAddress</td>
+<td>string</td>
+<td>כתובת למשלוח חשבונית</td>
+</tr>
+<tr>
+<td>fax</td>
+<td>string</td>
+<td>פקס</td>
+</tr>
+<tr>
+<td>accessPassword</td>
+<td>string</td>
+<td>סיסמת גישה למערכת</td>
+</tr>
+<tr>
+<td>units</td>
+<td>string</td>
+<td>כמות היחידות שבמערכת</td>
+</tr>
+<tr>
+<td>recordPassword</td>
+<td>string</td>
+<td>סיסמת הקלטות</td>
+</tr>
+<tr>
+<td>resellerCreditFile</td>
+<td>string</td>
+<td>שם משווק</td>
+</tr>
+<tr>
+<td>systemSite</td>
+<td>string</td>
+<td>אתר מערכת (לדוגמה: <code>yemot</code> <code>ymt</code> <code>ymta</code> <code>ymtb</code>)</td>
+</tr>
+<tr>
+<td>pirsumPhoneStatus</td>
+<td>Boolean</td>
+<td>האם המערכת פעילה ב"פרסומפון"</td>
+</tr>
+<tr>
+<td>ivrType</td>
+<td>string</td>
+<td>סוג המערכת (יפורט הסוגים)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>בתוך מערך <code>secondary_dids</code> (מספרים משניים) יופיעו האובייקטים הבאים</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>אובייקט</th>
+<th>תיאור</th>
+<th>דוגמה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>מזהה מספר משנה</td>
+<td><code>100</code></td>
+</tr>
+<tr>
+<td>did</td>
+<td>מספר משנה</td>
+<td>0773137770</td>
+</tr>
+<tr>
+<td>usage</td>
+<td>שימוש</td>
+<td><code>goto:/1</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>בתוך מערך <code>callerIds</code> (מספרי ספיישל) יופיעו האובייקטים הבאים</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>אובייקט</th>
+<th>תיאור</th>
+<th>דוגמה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>callerId</td>
+<td>מספר מאושר לזיהוי יוצא</td>
+<td>0773137770</td>
+</tr>
+<tr>
+<td>expiryDate</td>
+<td>פג תוקף של האישור לזיהוי</td>
+<td><code>2025-04-18+01:39:27</code> (במקום + יופיע רווח)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>הסוגים שאפשריים ב <code>ivrType</code></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>סוג</th>
+<th>תיאור</th>
+<th>הערה</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CAMPAIGN</td>
+<td>חייגן - מערכת קמפיינים</td>
+<td></td>
+</tr>
+<tr>
+<td>EMERGENCY</td>
+<td>חייגן חירום</td>
+<td></td>
+</tr>
+<tr>
+<td>IVR1</td>
+<td>מערכת IVR1</td>
+<td>מערכת שיצאה מתמיכה</td>
+</tr>
+<tr>
+<td>IVR2</td>
+<td>מערכת תוכן - IVR2</td>
+<td></td>
+</tr>
+<tr>
+<td>SPECIAL</td>
+<td>מערכת מיוחדת</td>
+<td>לא נפוץ</td>
+</tr>
+<tr>
+<td>WHATSAPP_PHONE</td>
+<td>וואצפון</td>
+<td>למערכות וואצפון אין גישה בAPI</td>
+</tr>
+<tr>
+<td>QUEUE</td>
+<td>תור</td>
+<td>לא נפוץ</td>
+</tr>
+<tr>
+<td>VIRTUAL_PLUS</td>
+<td>וירטואל פלוס</td>
+<td></td>
+</tr>
+<tr>
+<td>WHATSAPP_PHONE_ADMIN</td>
+<td>וואצפון מנהלים</td>
+<td></td>
+</tr>
+<tr>
+<td>DIAL_TO_SIP</td>
+<td>חיוג למשתמש SIP</td>
+<td></td>
+</tr>
+<tr>
+<td>NEW_WHATSAPP_PHONE</td>
+<td>וואצפון החדש</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="campaign-reports" data-search="דוח קמפיין ViewCampaignReports דוחות ומידע">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">דוחות ומידע</p>
+        <h2>דוח קמפיין</h2>
+      </div>
+      <code class="command-name">ViewCampaignReports</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מחזיר נתוני קמפיין וחיובים עבור קמפיינים נתמכים.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/ViewCampaignReports</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p><strong>הפקודה היא</strong> - <code>ViewCampaignReports</code></p>
+<hr />
+<p><strong>הדוחות המתקבלים בממשק זה הם דוחות על קמפיינים שפירוט החיוב שלהם מתחיל ב</strong></p>
+<pre><code>Start-YA-
+</code></pre>
+<p><strong>בלבד.</strong><br />
+למשל:</p>
+<p><img src="/assets/uploads/files/1641218626100-90a20430-33d2-4ec0-8755-9efc0d11a72b-image.png" alt="90a20430-33d2-4ec0-8755-9efc0d11a72b-image.png" /></p>
+<hr />
+<p><strong>הפרמטרים הנדרשים:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>סוג</th>
+<th>ערך</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>string</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>CampaignId</td>
+<td>string</td>
+<td>מזהה הקמפיין המבוקש. מזהה הקמפיין הוא כפי המופיע בדוח היחידות עם הסרה של <code>Start-YA-</code> מההתחלה.</td>
+<td><code>SMS-3-0773137770-Yemot-1641217161871</code></td>
+</tr>
+<tr>
+<td>json</td>
+<td>Boolean</td>
+<td>יש לשלוח ערך 1 על מנת לקבל מידע ב JSON</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>מאפייני תגובת השרת:</strong></p>
+<p>במידה שהבקשה תקינה, ערך "report" יכיל את הדוח של הקמפיין.<br />
+<strong>שימו לב, מבנה התגובה של הדוחות יוכל להשתנות בהתאם לסוג הקמפיין, ההסבר כרגע הוא על דוח של קמפיין סמס:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>ערך</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CampaignData</td>
+<td>Object</td>
+<td>מידע כללי על הקמפיין</td>
+</tr>
+<tr>
+<td>report</td>
+<td>Object</td>
+<td>כל איבר באובייקט הוא מספר טלפון שאליו נשלח הקמפיין ומכיל את המידע עליו.</td>
+</tr>
+</tbody>
+</table></div>
+<p>דוגמא למבנה מלא של דוח סמס:</p>
+<p><img src="/assets/uploads/files/1641221180333-daa8618c-6add-495d-b871-558057919b20-image.png" alt="daa8618c-6add-495d-b871-558057919b20-image.png" /></p>
+    </div>
+  </section>
+
+  <section class="api-section" id="validation-caller-id" data-search="אימות זיהוי יוצא ValidationCallerId אבטחה וזיהוי">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">אבטחה וזיהוי</p>
+        <h2>אימות זיהוי יוצא</h2>
+      </div>
+      <code class="command-name">ValidationCallerId</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> מוסיף ומאמת מספר שיוכל לשמש כזיהוי יוצא במערכת.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/ValidationCallerId</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <h4><strong>אימות תקף לשנה אחת. לאחר שנה מהאימות המספר יוסר ויהיה צורך לאמת אותו בשנית. אימות של מספר קיים יאריך את תוקף האימות של המספר בשנה מזמן האימות.</strong></h4>
+<p><strong>הפקודה היא -</strong> <code>ValidationCallerId</code></p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>action</td>
+<td>פעולה - (send/valid) להלן יפורטו הפעולות והפרמטרים</td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<p><span>פעולה: <strong>send</strong> - שליחת בקשת אימות:</span></p>
+<p><strong>הפרמטרים לפעולה send :</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>callerId</td>
+<td>המספר להוספה</td>
+<td>string</td>
+</tr>
+<tr>
+<td>validType</td>
+<td>סוג האימות. <code>SMS</code> / <code>CALL</code></td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>שליחת סמס/שיחת אימות הינה בעלות יחידות לפי התעריף הרגיל.</strong></p>
+<p>בתגובה תקינה יחזור:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>reqId</td>
+<td>string</td>
+<td>מזהה בקשת אימות. איתה יש לפנות על מנת לבצע אימות בפועל</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><span>פעולה: <strong>valid</strong> - אימות:</span></p>
+<p><strong>הפרמטרים לפעולה valid:</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reId</td>
+<td>מזהה בקשת אימות שהתקבל בפעולת send</td>
+<td>string</td>
+</tr>
+<tr>
+<td>code</td>
+<td>קוד האימות</td>
+<td>string</td>
+</tr>
+</tbody>
+</table></div>
+<p>בתגובה תקינה יחזור:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>responseStatus</td>
+<td>string</td>
+<td>סטטוס הפעולה</td>
+<td><code>OK</code></td>
+</tr>
+<tr>
+<td>status</td>
+<td>Boolean</td>
+<td>סטטוס הוספת זיהוי הספשייל. <code>true</code> בהצלחה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+
+  <section class="api-section" id="scheduled-tasks" data-search="תזמון משימות Tasks API אוטומציה">
+    <div class="section-heading">
+      <div>
+        <p class="section-group">אוטומציה</p>
+        <h2>תזמון משימות</h2>
+      </div>
+      <code class="command-name">Tasks API</code>
+    </div>
+    <p class="plain-summary"><strong>במילים פשוטות:</strong> יוצר, מציג, מעדכן ומוחק משימות מתוזמנות במערכת.</p>
+    <div class="endpoint-line">
+      <span>כתובת הפקודה</span>
+      <div class="endpoint-value">
+        <code>https://www.call2all.co.il/ym/api/COMMAND</code>
+        <button class="endpoint-copy" type="button">העתק כתובת</button>
+      </div>
+    </div>
+    <div class="source-doc">
+      <p>שימו לב, לע"ע לא יכול להיות מעל  10 משימות פעילות בכל לקוח.</p>
+<p><strong>הפקודה היא -</strong> <code>GetTasks</code><br />
+קבלת רשימת המשימות במערכת.</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>הגבלה לתוצאות (בחירת מחדל 100)</td>
+<td>int</td>
+</tr>
+</tbody>
+</table></div>
+<p>בתגובה תקינה יחזור מערך <code>tasks</code> המכיל בכל אובייקט משימה עם הפרטים הבאים:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>מזהה משימה (נדרש לביצוע פעולות, מחיקת משימה, עידכון משימה או קבלת לוגים)</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>description</td>
+<td>string</td>
+<td>תיאור חופשי של המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>string</td>
+<td>סוג המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>createTs</td>
+<td>string</td>
+<td>זמן יצירה</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>סטטוס המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>active</td>
+<td>Boolean(0/1)</td>
+<td>האם פעילה</td>
+<td></td>
+</tr>
+<tr>
+<td>sendMailInEnd</td>
+<td>Boolean(0/1)</td>
+<td>האם מוגדר לקבל מייל בעת סיום מוצלח</td>
+<td></td>
+</tr>
+<tr>
+<td>sendMailInError</td>
+<td>Boolean(0/1)</td>
+<td>האם מוגדר לקבל מייל בעת סיום בשגיאה</td>
+<td></td>
+</tr>
+<tr>
+<td>nextRun</td>
+<td>string</td>
+<td>זמן ריצה הבא</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>הפקודה היא -</strong> <code>GetTasksData</code><br />
+קבלת מידע מפורט על משימה מסויימת</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>TaskId</td>
+<td>מזהה משימה</td>
+<td>int</td>
+</tr>
+</tbody>
+</table></div>
+<p>בתגובה תקינה יחזור:</p>
+<p><strong>ערכים מוגדשים הם ערכים שנוספו על המידע המתקבל בתוך המערך של רשימת המשימות הכללית</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>מזהה משימה (נדרש לביצוע פעולות, מחיקת משימה, עידכון משימה או קבלת לוגים)</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>description</td>
+<td>string</td>
+<td>תיאור חופשי של המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>string</td>
+<td>סוג המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>createTs</td>
+<td>string</td>
+<td>זמן יצירה</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>סטטוס המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>active</td>
+<td>Boolean(0/1)</td>
+<td>האם פעילה</td>
+<td></td>
+</tr>
+<tr>
+<td>sendMailInEnd</td>
+<td>Boolean(0/1)</td>
+<td>האם מוגדר לקבל מייל בעת סיום מוצלח</td>
+<td></td>
+</tr>
+<tr>
+<td>sendMailInError</td>
+<td>Boolean(0/1)</td>
+<td>האם מוגדר לקבל מייל בעת סיום בשגיאה</td>
+<td></td>
+</tr>
+<tr>
+<td>nextRun</td>
+<td>string</td>
+<td>זמן ריצה הבא</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>updateTs</strong></td>
+<td>string</td>
+<td>זמן עדכון</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>lastRun</strong></td>
+<td>string</td>
+<td>זמן ריצה אחרון</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>minute</strong></td>
+<td>int</td>
+<td>הגדרת זמן ריצה: דקה</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>hour</strong></td>
+<td>int</td>
+<td>הגדרת זמן ריצה: שעה</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>year</strong></td>
+<td>int</td>
+<td>הגדרת זמן ריצה: שנה</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>day</strong></td>
+<td>int</td>
+<td>הגדרת זמן ריצה: יום בחודש</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>month</strong></td>
+<td>int</td>
+<td>הגדרת זמן ריצה: חודש</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>days_of_week</strong></td>
+<td>string</td>
+<td>הגדרת זמן ריצה: ימים בשבוע (ימים מופרדים בפסיקים 0=יום ראשון - 6=יום שבת)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>action_data</strong></td>
+<td>JSON</td>
+<td>מידע למנוע המשימות על הפעולות לביצוע במשימה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>הפקודה היא -</strong> <code>GetTasksLogs</code><br />
+קבלת לוג הפעלות על משימה מסויימת</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>תיאור</th>
+<th>סוג</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>טוקן</td>
+<td>string</td>
+</tr>
+<tr>
+<td>TaskId</td>
+<td>מזהה משימה</td>
+<td>int</td>
+</tr>
+</tbody>
+</table></div>
+<p>בתגובה תקינה יחזור ערך <code>logs</code> המכיל מערך שכל אובייקט מכיל את הפרטים הבאים:</p>
+<p><strong>ערכים מוגדשים הם ערכים שנוספו על המידע המתקבל בתוך המערך של רשימת המשימות הכללית</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>מזהה הפעלת המשימה</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>succeeded</td>
+<td>Boolean(0/1)</td>
+<td>האם הסטטוס הוא מוצלח</td>
+<td></td>
+</tr>
+<tr>
+<td>error_message</td>
+<td>string</td>
+<td>פירוט שגיאה</td>
+<td><code>Campaign Id does Not found in customer</code></td>
+</tr>
+<tr>
+<td><strong>ts</strong></td>
+<td>string</td>
+<td>זמן ההפעלה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>הפקודה היא -</strong> <code>CreateTask</code><br />
+יצירת משימה חדשה</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<p>פרמטרי זמן ריצה שלא נשלחים נחשבים כ null - ללא התחשבות</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>סוג</th>
+<th>תיאור</th>
+<th>מידע נוסף</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>string</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>description</td>
+<td>string</td>
+<td>תיאור חופשי של המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>minute</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: דקה</td>
+<td></td>
+</tr>
+<tr>
+<td>hour</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: שעה</td>
+<td></td>
+</tr>
+<tr>
+<td>year</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: שנה</td>
+<td></td>
+</tr>
+<tr>
+<td>day</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: יום בחודש</td>
+<td></td>
+</tr>
+<tr>
+<td>month</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: חודש</td>
+<td></td>
+</tr>
+<tr>
+<td>active</td>
+<td>Boolean(0/1)</td>
+<td>האם משימה פעילה</td>
+<td></td>
+</tr>
+<tr>
+<td>checkIsKodesh</td>
+<td>Boolean(0/1)</td>
+<td>האם למנוע מהמשימה לרוץ בשבתות וחגים</td>
+<td></td>
+</tr>
+<tr>
+<td>mailInEnd</td>
+<td>Boolean(0/1)</td>
+<td>האם לשלוח מייל בסיום מוצלח</td>
+<td></td>
+</tr>
+<tr>
+<td>mailInError</td>
+<td>Boolean(0/1)</td>
+<td>האם לשלוח מייל בסיום בכישלון</td>
+<td></td>
+</tr>
+<tr>
+<td>ifAnyDay</td>
+<td>Boolean(0/1)</td>
+<td>אם זה 1 אז כל לא בודק התחשבנות ב  days</td>
+<td></td>
+</tr>
+<tr>
+<td>days</td>
+<td>(string(JSON</td>
+<td>סטרינג המכיל JSON לפי הדוגמא מטה, כל איבר באובייקט המפתח שלו הוא יום. במידה שערך זה לא יהיה תקין יכנס null - כל הימים בשבוע</td>
+<td></td>
+</tr>
+<tr>
+<td>taskType</td>
+<td>string</td>
+<td>סוג משימה</td>
+<td>כרגע יכול להיות: <code>SendSMS</code> / <code>RunTzintuk</code>/<code>MoveOnFile</code></td>
+</tr>
+<tr>
+<td>callerId</td>
+<td>string</td>
+<td>זיהוי יוצא</td>
+<td>רלוונטי לסוגי משימות <code>SendSMS</code> / <code>RunTzintuk</code></td>
+</tr>
+<tr>
+<td>toList</td>
+<td>string</td>
+<td>מזהה / שם רשימה</td>
+<td>רלוונטי לסוגי משימות<code>RunTzintuk</code></td>
+</tr>
+<tr>
+<td>smsList</td>
+<td>string</td>
+<td>מזהה רשימת תפוצה</td>
+<td>רלוונטי לסוגי משימות<code>SendSMS</code></td>
+</tr>
+<tr>
+<td>typeList</td>
+<td>string</td>
+<td>סוג רשימה</td>
+<td>רלוונטי לסוגי משימות<code>RunTzintuk</code>. יכול להיות <code>tpl</code> / <code>tzl</code></td>
+</tr>
+<tr>
+<td>smsMessage</td>
+<td>string</td>
+<td>טקסט להודעת סמס</td>
+<td>רלוונטי לסוגי משימות<code>SendSMS</code></td>
+</tr>
+<tr>
+<td>folder</td>
+<td>string</td>
+<td>תיקיית מקור</td>
+<td>רלוונטי לסוגי משימות<code>MoveOnFile</code></td>
+</tr>
+<tr>
+<td>target</td>
+<td>string</td>
+<td>תיקיית יעד</td>
+<td>רלוונטי לסוגי משימות<code>MoveOnFile</code></td>
+</tr>
+<tr>
+<td>moveFileType</td>
+<td>string</td>
+<td>סוג קובץ, <code>maxFile</code>/<code>minFile</code></td>
+<td>רלוונטי לסוגי משימות<code>MoveOnFile</code></td>
+</tr>
+<tr>
+<td>blockMoveIfNewFileInMinutes</td>
+<td>int</td>
+<td>חסימת העברת הקובץ במידה שבשלוחת היעד קיים קובץ שהוקלט בטווח הדקות שמצויין</td>
+<td>רלוונטי לסוגי משימות<code>MoveOnFile</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>דוגמא לסטרינג JSON המכיל מידע על ימי הפעילות:</strong></p>
+<pre><code>{"0":1,"1":0,"2":1,"3":1,"4":0,"5":0,"6":0}
+</code></pre>
+<p>כלומר - כל key הוא יום. כל valus אומר ב 0 / 1 האם היום פעיל או לא.<br />
+בדוגמא למעלה רק ימים ראשון ושלישי מאופשרים.<br />
+להזכירכם: 0-זה יום ראשון ו6-זה יום שבת</p>
+<p>בתגובה תקינה יחזור:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int</td>
+<td>מזהה הפעלת המשימה</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>jobId</td>
+<td>int</td>
+<td>מזהה משימה שנוצרה</td>
+<td></td>
+</tr>
+<tr>
+<td>ActionData</td>
+<td>object</td>
+<td>אובייקט עם מידע על המשימה נכון לאיך שהיא נקלטה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>הפקודה היא -</strong> <code>UpdateTask</code><br />
+עידכון זמני ריצה של משימה קיימת.</p>
+<ul>
+<li>לא ניתן לשנות את סוג המשימה או את הדברים שהמשימה עושה</li>
+</ul>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<p>פרמטרי זמן ריצה שלא נשלחים נחשבים כ null - ללא התחשבות</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>סוג</th>
+<th>תיאור</th>
+<th>מידע נוסף</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>string</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>TaskId</td>
+<td>int</td>
+<td>מזהה משימה לעריכה</td>
+<td>חובה</td>
+</tr>
+<tr>
+<td>description</td>
+<td>string</td>
+<td>תיאור חופשי של המשימה</td>
+<td></td>
+</tr>
+<tr>
+<td>minute</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: דקה</td>
+<td></td>
+</tr>
+<tr>
+<td>hour</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: שעה</td>
+<td></td>
+</tr>
+<tr>
+<td>year</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: שנה</td>
+<td></td>
+</tr>
+<tr>
+<td>day</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: יום בחודש</td>
+<td></td>
+</tr>
+<tr>
+<td>month</td>
+<td>int</td>
+<td>הגדרת זמן ריצה: חודש</td>
+<td></td>
+</tr>
+<tr>
+<td>active</td>
+<td>Boolean(0/1)</td>
+<td>האם משימה פעילה</td>
+<td></td>
+</tr>
+<tr>
+<td>mailInEnd</td>
+<td>Boolean(0/1)</td>
+<td>האם לשלוח מייל בסיום מוצלח</td>
+<td></td>
+</tr>
+<tr>
+<td>mailInError</td>
+<td>Boolean(0/1)</td>
+<td>האם לשלוח מייל בסיום בכישלון</td>
+<td></td>
+</tr>
+<tr>
+<td>ifAnyDay</td>
+<td>Boolean(0/1)</td>
+<td>אם זה 1 אז כל לא בודק התחשבנות ב  days</td>
+<td></td>
+</tr>
+<tr>
+<td>days</td>
+<td>(string(JSON</td>
+<td>סטרינג המכיל JSON לפי הדוגמא מטה, כל איבר באובייקט המפתח שלו הוא יום. במידה שערך זה לא יהיה תקין יכנס null - כל הימים בשבוע</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>דוגמא לסטרינג JSON המכיל מידע על ימי הפעילות:</strong></p>
+<pre><code>{"0":1,"1":0,"2":1,"3":1,"4":0,"5":0,"6":0}
+</code></pre>
+<p>כלומר - כל key הוא יום. כל valus אומר ב 0 / 1 האם היום פעיל או לא.<br />
+בדוגמא למעלה רק ימים ראשון ושלישי מאופשרים.<br />
+להזכירכם: 0-זה יום ראשון ו6-זה יום שבת</p>
+<p>בתגובה תקינה יחזור:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>Boolean</td>
+<td>יהיה <code>true</code></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><strong>הפקודה היא -</strong> <code>DeleteTask</code><br />
+מחיקת משימה</p>
+<p><strong>הפרמטרים הנדרשים</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>פרמטר</th>
+<th>סוג</th>
+<th>תיאור</th>
+<th>מידע נוסף</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>token</td>
+<td>string</td>
+<td>טוקן</td>
+<td></td>
+</tr>
+<tr>
+<td>TaskId</td>
+<td>int</td>
+<td>מזהה משימה למחיקה</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>בתגובה תקינה יחזור:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>מאפיין</th>
+<th>סוג</th>
+<th>הסבר</th>
+<th>דוגמא</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>status</td>
+<td>int</td>
+<td>מספר המשימות שנמחקו</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+    </div>
+  </section>
+    </main>
+  </div>
+
   <script>
     document.querySelectorAll("pre").forEach((block) => {
       const button = document.createElement("button");
@@ -709,26 +4194,45 @@ if (result.responseStatus === "OK") {
       button.type = "button";
       button.textContent = "העתק";
       button.setAttribute("aria-label", "העתקת הפקודה");
-
       button.addEventListener("click", async () => {
         const code = block.querySelector("code");
-        const text = code ? code.innerText : block.innerText;
-
+        const text = (code ? code.innerText : block.innerText).trim();
         try {
-          await navigator.clipboard.writeText(text.trim());
+          await navigator.clipboard.writeText(text);
           button.textContent = "הועתק";
-          window.setTimeout(() => {
-            button.textContent = "העתק";
-          }, 1600);
-        } catch (error) {
+        } catch {
           button.textContent = "לא הועתק";
-          window.setTimeout(() => {
-            button.textContent = "העתק";
-          }, 1600);
         }
+        window.setTimeout(() => { button.textContent = "העתק"; }, 1600);
       });
-
       block.appendChild(button);
+    });
+
+    document.querySelectorAll(".endpoint-copy").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const text = button.parentElement.querySelector("code").innerText.trim();
+        try {
+          await navigator.clipboard.writeText(text);
+          button.textContent = "הועתק";
+        } catch {
+          button.textContent = "לא הועתק";
+        }
+        window.setTimeout(() => { button.textContent = "העתק כתובת"; }, 1600);
+      });
+    });
+
+    const search = document.getElementById("guide-search");
+    const guideSections = [...document.querySelectorAll(".api-section")];
+    const emptyState = document.getElementById("empty-state");
+    search.addEventListener("input", () => {
+      const query = search.value.trim().toLowerCase();
+      let visible = 0;
+      guideSections.forEach((section) => {
+        const matches = !query || section.innerText.toLowerCase().includes(query);
+        section.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      emptyState.classList.toggle("visible", visible === 0);
     });
   </script>
 </body>
