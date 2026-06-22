@@ -67,6 +67,11 @@
     .env-balloon p { margin: 0 0 9px; }
     .env-balloon ol { margin: 8px 0 12px; }
     .env-example { display: grid; gap: 7px; padding: 12px; background: var(--surface-soft); border-radius: 6px; }
+    .guide-intro { margin-top: 22px; padding-top: 21px; border-top: 1px solid var(--line); }
+    .guide-intro h2 { margin: 0 0 8px; font-size: 22px; }
+    .guide-intro p { max-width: 900px; margin: 0; color: var(--muted); }
+    .guide-features { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 13px 0 0; padding: 0; list-style: none; }
+    .guide-features li::before { content: "✓"; margin-inline-end: 6px; color: var(--teal); font-weight: 800; }
 
     .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 32px; padding: 30px 0 60px; direction: ltr; }
     .sidebar, main { direction: rtl; }
@@ -169,6 +174,17 @@
             <p><strong>חשוב:</strong> GitHub Pages מציג HTML בלבד ואין בו שרת ששומר סודות. לכן אסור להכניס טוקן אמיתי למדריך או לקוד JavaScript שרץ בדפדפן.</p>
           </div>
         </details>
+      </div>
+      <div class="guide-intro">
+        <h2>איך משתמשים במדריך?</h2>
+        <p>בהמשך מופיעות פקודות הממשק, המחולקות לפי נושאים. בחרו את הקטגוריה המתאימה לפעולה שברצונכם לבצע, ולאחר מכן בחרו את הפקודה הרצויה.</p>
+        <ul class="guide-features">
+          <li>הסבר פשוט על מטרת הפקודה</li>
+          <li>פירוט ההגדרות הנדרשות</li>
+          <li>הסבר היכן מגדירים כל דבר</li>
+          <li>דוגמאות ברורות לשימוש</li>
+          <li>כפתורים להעתקת הפקודות והכתובות</li>
+        </ul>
       </div>
     </div>
   </div>
