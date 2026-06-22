@@ -251,7 +251,7 @@
 <tbody>
 <tr>
 <td>token</td>
-<td>מפתח הגישה שמזהה את המערכת ומאשר לבצע בה פעולות. בתוך הכתובת כותבים <code>token=YOUR_TOKEN</code>, ומחליפים את <code>YOUR_TOKEN</code> בטוקן האמיתי.</td>
+<td>מפתח הגישה שמזהה את המערכת ומאשר לבצע בה פעולות. אפשר לכתוב מספר מערכת וסיסמה, מופרדים בנקודתיים וללא רווחים. לדוגמה: <code>token=0770000000:1234</code>. המספר והסיסמה בדוגמה אינם פרטים אמיתיים.</td>
 <td></td>
 </tr>
 <tr>
@@ -264,8 +264,8 @@
 <div class="parameter-help">
         <h3>איך משלבים את הפרמטרים בכתובת?</h3>
         <p>אחרי שם הפקודה מוסיפים סימן שאלה <code>?</code> ואת הפרמטר הראשון. בין פרמטר לפרמטר מוסיפים את הסימן <code>&amp;</code>.</p>
-        <pre><code>https://www.call2all.co.il/ym/api/GetTextFile?token=YOUR_TOKEN&amp;what=ivr2:1/ext.ini</code></pre>
-        <p><code>YOUR_TOKEN</code> הוא רק סימון לדוגמה. מחליפים אותו בטוקן האמיתי של המערכת, ואין לפרסם את הכתובת לאחר שהכנסתם בה טוקן אמיתי.</p>
+        <pre><code>https://www.call2all.co.il/ym/api/GetTextFile?token=0770000000:1234&amp;what=ivr2:1/ext.ini</code></pre>
+        <p>בדוגמה, <code>0770000000</code> הוא מספר מערכת לדוגמה ו־<code>1234</code> היא סיסמה לדוגמה. במערכת אמיתית מחליפים אותם במספר המערכת ובסיסמה שלכם, ואין לפרסם את הכתובת לאחר הכנסת הפרטים האמיתיים.</p>
       </div>
       <p><strong>מאפייני תגובת השרת:</strong></p>
 <div class="table-scroll"><table>
